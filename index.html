@@ -171,6 +171,16 @@
       cursor: pointer;
     }
     .btn-edit:hover { background: #f0f3ff; color: #2a4898; border-color: #a8b8ef; }
+    .btn-delete {
+      padding: 7px 16px;
+      background: #fff;
+      border: 1.5px solid #f0d0d0;
+      border-radius: 7px;
+      font-size: 13px;
+      color: #c0392b;
+      cursor: pointer;
+    }
+    .btn-delete:hover { background: #fff0f0; border-color: #c0392b; }
     .btn-write-sm {
       padding: 7px 16px;
       background: #2a4898;
@@ -301,6 +311,7 @@
             <div class="read-ch-date" id="read-ch-date"></div>
           </div>
           <div class="read-actions">
+            <button class="btn-delete" onclick="deleteChapter()">삭제</button>
             <button class="btn-edit" onclick="openEditor(true)">수정</button>
             <button class="btn-write-sm" onclick="openEditor()">+ 새 장 작성</button>
           </div>
@@ -433,6 +444,17 @@
     }
     showState('editor');
     document.getElementById('input-title').focus();
+  }
+
+  function deleteChapter() {
+    if (!confirm(`"${chapter}" 을 삭제할까요?`)) return;
+    const data = db.get();
+    delete data[book][chapter];
+    if (!Object.keys(data[book]).length) delete data[book];
+    db.set(data);
+    chapter = null;
+    renderList();
+    showState('empty');
   }
 
   function cancelEdit() {
