@@ -14,25 +14,16 @@
       overflow: hidden;
     }
 
-    /* ───────── 메인 (일상) ───────── */
+    /* ───────── 메인(일상) ───────── */
     #view-main {
       padding: 52px 60px;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      gap: 32px;
+      gap: 28px;
     }
-    .main-title {
-      font-size: 2em;
-      font-weight: 800;
-      color: #1a1a2e;
-      letter-spacing: -0.02em;
-    }
-    .menu-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .main-title { font-size: 2em; font-weight: 800; color: #1a1a2e; letter-spacing: -0.02em; }
+    .menu-list { display: flex; flex-direction: column; gap: 10px; }
     .menu-item {
       display: flex;
       align-items: center;
@@ -45,131 +36,42 @@
       transition: all 0.13s;
       max-width: 480px;
     }
-    .menu-item:hover {
-      border-color: #2a4898;
-      box-shadow: 0 2px 12px rgba(42,72,152,0.1);
-      transform: translateX(3px);
-    }
-    .menu-num {
-      font-size: 12px;
-      font-weight: 700;
-      color: #bbb;
-      width: 20px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-    .menu-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: #222;
-      flex: 1;
-    }
-    .menu-arrow {
-      color: #ccc;
-      font-size: 16px;
-    }
+    .menu-item:hover { border-color: #2a4898; box-shadow: 0 2px 12px rgba(42,72,152,0.1); transform: translateX(3px); }
+    .menu-num { font-size: 12px; font-weight: 700; color: #bbb; width: 20px; text-align: center; flex-shrink: 0; }
+    .menu-name { font-size: 15px; font-weight: 600; color: #222; flex: 1; }
+    .menu-arrow { color: #ccc; font-size: 16px; }
     .menu-item:hover .menu-arrow { color: #2a4898; }
 
-    /* 추가 버튼 */
-    .add-row {
+    /* ───────── 공통 상단 ───────── */
+    .view-header {
       display: flex;
       align-items: center;
-      gap: 10px;
-      max-width: 480px;
+      gap: 14px;
+      padding: 20px 32px 0;
+      flex-shrink: 0;
     }
-    #add-input {
-      flex: 1;
-      padding: 14px 18px;
-      border: 1.5px dashed #d0d6ea;
-      border-radius: 12px;
-      font-size: 14px;
-      font-family: inherit;
-      color: #333;
-      background: transparent;
-      outline: none;
-      display: none;
+    .btn-back {
+      font-size: 12px; color: #999; background: none; border: none;
+      cursor: pointer; padding: 0; font-family: inherit; display: flex; align-items: center; gap: 4px;
     }
-    #add-input::placeholder { color: #ccc; }
-    #add-input:focus { border-color: #2a4898; border-style: solid; }
-    .btn-add-open {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 20px;
-      background: transparent;
-      border: 1.5px dashed #d0d6ea;
-      border-radius: 12px;
-      font-size: 14px;
-      color: #aaa;
-      cursor: pointer;
-      font-family: inherit;
-      transition: all 0.13s;
-      max-width: 480px;
-      width: 100%;
-    }
-    .btn-add-open:hover { border-color: #2a4898; color: #2a4898; }
-    .btn-add-confirm {
-      display: none;
-      padding: 14px 20px;
-      background: #2a4898;
-      color: #fff;
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      white-space: nowrap;
-    }
-    .btn-add-confirm:hover { background: #1a3570; }
+    .btn-back:hover { color: #2a4898; }
+    .view-h-title { font-size: 1.3em; font-weight: 700; color: #1a3570; }
 
-    /* ───────── 성경필사 홈 ───────── */
+    /* ───────── 성경필사 ───────── */
     #view-bible {
-      padding: 32px 44px;
       height: 100vh;
       display: none;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
+      padding-bottom: 20px;
     }
-    .back-to-main {
-      font-size: 12px;
-      color: #999;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-family: inherit;
-    }
-    .back-to-main:hover { color: #2a4898; }
-    .bible-title {
-      font-size: 1.4em;
-      font-weight: 700;
-      color: #1a3570;
-    }
-    .testament-block { display: flex; flex-direction: column; gap: 10px; }
-    .testament-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #aaa;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
+    .testament-block { display: flex; flex-direction: column; gap: 10px; padding: 0 32px; }
+    .testament-label { font-size: 11px; font-weight: 700; color: #aaa; letter-spacing: 0.12em; text-transform: uppercase; }
     .book-grid { display: flex; flex-wrap: wrap; gap: 7px; }
     .book-btn {
-      padding: 8px 14px;
-      background: #fff;
-      border: 1.5px solid #dce3f5;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #2a4898;
-      cursor: pointer;
-      transition: all 0.13s;
-      min-width: 66px;
-      text-align: center;
+      padding: 8px 14px; background: #fff; border: 1.5px solid #dce3f5; border-radius: 8px;
+      font-size: 13px; font-weight: 500; color: #2a4898; cursor: pointer; transition: all 0.13s;
+      min-width: 66px; text-align: center;
     }
     .book-btn:hover { background: #2a4898; color: #fff; border-color: #2a4898; }
     .book-btn.written { background: #eef1ff; border-color: #a8b8ef; }
@@ -177,184 +79,197 @@
     /* ───────── 책 상세 ───────── */
     #view-book { display: none; height: 100vh; }
     .book-layout { display: flex; height: 100%; }
-
     .sidebar {
-      width: 210px;
-      min-width: 210px;
-      background: #fff;
-      border-right: 1px solid #e4e9f5;
-      display: flex;
-      flex-direction: column;
+      width: 210px; min-width: 210px; background: #fff;
+      border-right: 1px solid #e4e9f5; display: flex; flex-direction: column;
     }
-    .sidebar-top {
-      padding: 18px 16px 14px;
-      border-bottom: 1px solid #e4e9f5;
-    }
-    .back-btn {
-      font-size: 12px;
-      color: #888;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-family: inherit;
-    }
-    .back-btn:hover { color: #2a4898; }
+    .sidebar-top { padding: 18px 16px 14px; border-bottom: 1px solid #e4e9f5; }
     .sidebar-book-name { font-size: 1.1em; font-weight: 700; color: #1a3570; }
     .chapter-list { flex: 1; overflow-y: auto; padding: 8px 0; }
-    .chapter-item {
-      padding: 10px 16px;
-      cursor: pointer;
-      border-left: 3px solid transparent;
-      transition: background 0.1s;
-    }
+    .chapter-item { padding: 10px 16px; cursor: pointer; border-left: 3px solid transparent; transition: background 0.1s; }
     .chapter-item:hover { background: #f4f6ff; }
     .chapter-item.active { background: #eef1ff; border-left-color: #2a4898; }
     .ch-name { font-size: 13px; font-weight: 600; color: #2a4898; }
     .ch-date { font-size: 11px; color: #bbb; margin-top: 2px; }
-    .sidebar-empty {
-      padding: 20px 16px;
-      font-size: 12px;
-      color: #ccc;
-      line-height: 1.7;
-      text-align: center;
-    }
-
+    .sidebar-empty { padding: 20px 16px; font-size: 12px; color: #ccc; line-height: 1.7; text-align: center; }
     .main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
-    #state-empty {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-    }
+    #state-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
     .empty-text { font-size: 14px; color: #ccc; }
     .btn-write-main {
-      padding: 13px 36px;
-      background: #2a4898;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(42,72,152,0.22);
-      transition: background 0.13s;
+      padding: 13px 36px; background: #2a4898; color: #fff; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 14px rgba(42,72,152,0.22);
     }
     .btn-write-main:hover { background: #1a3570; }
-
     #state-read { display: none; flex: 1; flex-direction: column; overflow: hidden; }
     .read-topbar {
-      padding: 24px 40px 18px;
-      border-bottom: 1px solid #e4e9f5;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
+      padding: 24px 40px 18px; border-bottom: 1px solid #e4e9f5;
+      display: flex; align-items: flex-end; justify-content: space-between;
     }
     .read-ch-title { font-size: 1.5em; font-weight: 700; color: #1a3570; }
     .read-ch-date { font-size: 12px; color: #bbb; margin-top: 4px; }
     .read-actions { display: flex; gap: 8px; }
-    .btn-delete {
-      padding: 7px 16px;
-      background: #fff;
-      border: 1.5px solid #f0d0d0;
-      border-radius: 7px;
-      font-size: 13px;
-      color: #c0392b;
-      cursor: pointer;
-    }
+    .btn-delete { padding: 7px 16px; background: #fff; border: 1.5px solid #f0d0d0; border-radius: 7px; font-size: 13px; color: #c0392b; cursor: pointer; }
     .btn-delete:hover { background: #fff0f0; border-color: #c0392b; }
-    .btn-edit {
-      padding: 7px 16px;
-      background: #fff;
-      border: 1.5px solid #dce3f5;
-      border-radius: 7px;
-      font-size: 13px;
-      color: #555;
-      cursor: pointer;
-    }
+    .btn-edit { padding: 7px 16px; background: #fff; border: 1.5px solid #dce3f5; border-radius: 7px; font-size: 13px; color: #555; cursor: pointer; }
     .btn-edit:hover { background: #f0f3ff; color: #2a4898; border-color: #a8b8ef; }
-    .btn-write-sm {
-      padding: 7px 16px;
-      background: #2a4898;
-      color: #fff;
-      border: none;
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .btn-write-sm { padding: 7px 16px; background: #2a4898; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-write-sm:hover { background: #1a3570; }
-    .read-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px 40px;
-      font-size: 15px;
-      line-height: 2.1;
-      color: #333;
-      white-space: pre-wrap;
-    }
-
+    .read-body { flex: 1; overflow-y: auto; padding: 28px 40px; font-size: 15px; line-height: 2.1; color: #333; white-space: pre-wrap; }
     #state-editor { display: none; flex: 1; flex-direction: column; overflow: hidden; }
-    .editor-topbar {
-      padding: 20px 40px 16px;
-      border-bottom: 2px solid #e4e9f5;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    #input-title {
-      font-size: 1.5em;
-      font-weight: 700;
-      color: #1a3570;
-      border: none;
-      outline: none;
-      background: transparent;
-      width: 180px;
-      font-family: inherit;
-    }
+    .editor-topbar { padding: 20px 40px 16px; border-bottom: 2px solid #e4e9f5; display: flex; align-items: center; gap: 12px; }
+    #input-title { font-size: 1.5em; font-weight: 700; color: #1a3570; border: none; outline: none; background: transparent; width: 180px; font-family: inherit; }
     #input-title::placeholder { color: #ddd; font-weight: 400; }
     .editor-btns { margin-left: auto; display: flex; gap: 8px; }
-    .btn-cancel {
-      padding: 7px 14px;
-      background: #fff;
-      border: 1.5px solid #dce3f5;
-      border-radius: 7px;
-      font-size: 13px;
-      color: #777;
-      cursor: pointer;
-    }
-    .btn-cancel:hover { background: #f5f5f5; }
-    .btn-save {
-      padding: 7px 22px;
-      background: #2a4898;
-      color: #fff;
-      border: none;
-      border-radius: 7px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .btn-cancel { padding: 7px 14px; background: #fff; border: 1.5px solid #dce3f5; border-radius: 7px; font-size: 13px; color: #777; cursor: pointer; }
+    .btn-save { padding: 7px 22px; background: #2a4898; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-save:hover { background: #1a3570; }
-    #input-content {
-      flex: 1;
-      padding: 24px 40px;
-      border: none;
-      outline: none;
-      resize: none;
-      font-size: 15px;
-      line-height: 2.1;
-      color: #333;
-      background: transparent;
-      font-family: inherit;
-    }
+    #input-content { flex: 1; padding: 24px 40px; border: none; outline: none; resize: none; font-size: 15px; line-height: 2.1; color: #333; background: transparent; font-family: inherit; }
     #input-content::placeholder { color: #ddd; }
+
+    /* ───────── 일상 기록 ───────── */
+    #view-daily {
+      height: 100vh;
+      display: none;
+      flex-direction: column;
+    }
+    .daily-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px 14px;
+      flex-shrink: 0;
+      border-bottom: 1px solid #e4e8f5;
+      background: #fff;
+    }
+    .daily-left { display: flex; align-items: center; gap: 14px; }
+    .week-nav { display: flex; align-items: center; gap: 10px; }
+    .btn-week {
+      padding: 5px 12px; background: #fff; border: 1.5px solid #dce3f5;
+      border-radius: 6px; font-size: 12px; color: #555; cursor: pointer; font-family: inherit;
+    }
+    .btn-week:hover { background: #f0f3ff; color: #2a4898; border-color: #a8b8ef; }
+    .week-label { font-size: 13px; font-weight: 600; color: #444; min-width: 120px; text-align: center; }
+    .daily-actions { display: flex; align-items: center; gap: 8px; }
+    .btn-add-habit {
+      padding: 6px 14px; background: #fff; border: 1.5px dashed #c0cae8;
+      border-radius: 7px; font-size: 12px; color: #888; cursor: pointer; font-family: inherit;
+    }
+    .btn-add-habit:hover { border-color: #2a4898; color: #2a4898; }
+    .btn-edit-mode {
+      padding: 6px 14px; background: #fff; border: 1.5px solid #dce3f5;
+      border-radius: 7px; font-size: 12px; color: #888; cursor: pointer; font-family: inherit;
+    }
+    .btn-edit-mode.active { background: #eef1ff; color: #2a4898; border-color: #a8b8ef; }
+
+    /* 테이블 */
+    .table-wrapper {
+      flex: 1;
+      overflow: auto;
+      background: #fff;
+    }
+    .habit-table {
+      border-collapse: collapse;
+      table-layout: fixed;
+      min-width: 100%;
+    }
+    .habit-table th {
+      background: #f4f6ff;
+      font-size: 12px;
+      font-weight: 700;
+      color: #555;
+      padding: 10px 8px;
+      text-align: center;
+      border: 1px solid #dde3f5;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      white-space: nowrap;
+    }
+    .habit-table th.col-habit {
+      width: 155px;
+      min-width: 155px;
+      left: 0;
+      z-index: 3;
+      text-align: left;
+      padding-left: 14px;
+    }
+    .habit-table th.today-col { background: #dce8ff; color: #2a4898; }
+    .habit-table td {
+      border: 1px solid #dde3f5;
+      vertical-align: top;
+      padding: 0;
+      min-width: 110px;
+    }
+    .habit-table td.habit-name-cell {
+      background: #fafbff;
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+      padding: 0;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      width: 155px;
+      min-width: 155px;
+    }
+    .habit-name-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 10px 10px 14px;
+      min-height: 52px;
+      gap: 4px;
+    }
+    .habit-name-text { flex: 1; line-height: 1.4; }
+    .btn-del-habit {
+      display: none;
+      background: none;
+      border: none;
+      color: #e74c3c;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0 2px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .edit-mode .btn-del-habit { display: block; }
+    .cell-check-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px 5px;
+      border-bottom: 1px solid #eef0f8;
+      cursor: pointer;
+    }
+    .cell-checkbox {
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+      accent-color: #2a4898;
+      flex-shrink: 0;
+    }
+    .cell-check-label {
+      font-size: 11px;
+      color: #ccc;
+      user-select: none;
+    }
+    .cell-check-label.done { color: #2a4898; font-weight: 700; }
+    .cell-text {
+      padding: 5px 10px 8px;
+      font-size: 12px;
+      color: #444;
+      outline: none;
+      min-height: 38px;
+      line-height: 1.6;
+      font-family: inherit;
+      width: 100%;
+      display: block;
+    }
+    .cell-text:focus { background: #f0f5ff; }
+    .cell-text:empty:before { content: attr(data-placeholder); color: #ddd; pointer-events: none; }
+    .habit-table tr:hover td { background: #fafcff; }
+    .habit-table tr:hover td.habit-name-cell { background: #f4f6ff; }
+    .habit-table td.today-col { background: #f8faff; }
   </style>
 </head>
 <body>
@@ -362,27 +277,30 @@
 <!-- ───── 일상 메인 ───── -->
 <div id="view-main">
   <div class="main-title">일상</div>
-
-  <div class="menu-list" id="menu-list"></div>
-
-  <div class="add-row" id="add-row">
-    <button class="btn-add-open" id="btn-add-open" onclick="toggleAddInput()">+ 새 항목 추가</button>
-    <input id="add-input" type="text" placeholder="항목 이름 입력 후 Enter"
-      onkeydown="if(event.key==='Enter') confirmAdd(); if(event.key==='Escape') toggleAddInput(false);" />
-    <button class="btn-add-confirm" id="btn-add-confirm" onclick="confirmAdd()">추가</button>
+  <div class="menu-list">
+    <div class="menu-item" onclick="openBible()">
+      <span class="menu-num">1</span>
+      <span class="menu-name">성경필사</span>
+      <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="openDaily()">
+      <span class="menu-num">2</span>
+      <span class="menu-name">일상</span>
+      <span class="menu-arrow">›</span>
+    </div>
   </div>
 </div>
 
-<!-- ───── 성경필사 홈 ───── -->
+<!-- ───── 성경필사 ───── -->
 <div id="view-bible">
-  <button class="back-to-main" onclick="goMain()">← 일상</button>
-  <div class="bible-title">성경 필사</div>
-
+  <div class="view-header">
+    <button class="btn-back" onclick="goMain()">← 일상</button>
+    <div class="view-h-title">성경필사</div>
+  </div>
   <div class="testament-block">
     <div class="testament-label">구약성경 (39권)</div>
     <div class="book-grid" id="ot-grid"></div>
   </div>
-
   <div class="testament-block">
     <div class="testament-label">신약성경 (27권)</div>
     <div class="book-grid" id="nt-grid"></div>
@@ -394,7 +312,7 @@
   <div class="book-layout">
     <div class="sidebar">
       <div class="sidebar-top">
-        <button class="back-btn" onclick="goBible()">← 성경 목록</button>
+        <button class="btn-back" style="margin-bottom:10px" onclick="openBible()">← 성경 목록</button>
         <div class="sidebar-book-name" id="sidebar-title"></div>
       </div>
       <div class="chapter-list" id="chapter-list"></div>
@@ -432,7 +350,28 @@
   </div>
 </div>
 
+<!-- ───── 일상 기록 ───── -->
+<div id="view-daily">
+  <div class="daily-topbar">
+    <div class="daily-left">
+      <button class="btn-back" onclick="goMain()">← 일상</button>
+      <div class="view-h-title">일상 기록</div>
+    </div>
+    <div class="week-nav">
+      <button class="btn-week" onclick="moveWeek(-1)">‹ 이전</button>
+      <div class="week-label" id="week-label"></div>
+      <button class="btn-week" onclick="moveWeek(1)">다음 ›</button>
+    </div>
+    <div class="daily-actions">
+      <button class="btn-edit-mode" id="btn-edit-mode" onclick="toggleEditMode()">편집</button>
+      <button class="btn-add-habit" onclick="addHabit()">+ 항목 추가</button>
+    </div>
+  </div>
+  <div class="table-wrapper" id="table-wrapper"></div>
+</div>
+
 <script>
+  /* ════════ 공통 ════════ */
   const OT = ['창세기','출애굽기','레위기','민수기','신명기','여호수아','사사기','룻기',
     '사무엘상','사무엘하','열왕기상','열왕기하','역대상','역대하','에스라','느헤미야',
     '에스더','욥기','시편','잠언','전도서','아가','이사야','예레미야','예레미야애가',
@@ -443,91 +382,32 @@
     '데살로니가후서','디모데전서','디모데후서','디도서','빌레몬서','히브리서','야고보서',
     '베드로전서','베드로후서','요한일서','요한이서','요한삼서','유다서','요한계시록'];
 
+  const DAY_KO = ['일','월','화','수','목','금','토'];
+
+  function showView(id) {
+    ['view-main','view-bible','view-book','view-daily'].forEach(v => {
+      const el = document.getElementById(v);
+      el.style.display = (v === id) ? 'flex' : 'none';
+      if (v === 'view-book' && v === id) el.style.display = 'block';
+    });
+  }
+
+  function goMain() { showView('view-main'); }
+
+  /* ════════ 성경필사 ════════ */
   const BIBLE_KEY = 'bible_notes_v1';
-  const MENU_KEY  = 'daily_menu_v1';
-
-  let book = null, chapter = null, editMode = false;
-
   const bibleDB = {
     get: () => JSON.parse(localStorage.getItem(BIBLE_KEY) || '{}'),
     set: d  => localStorage.setItem(BIBLE_KEY, JSON.stringify(d))
   };
-  const menuDB = {
-    get: () => JSON.parse(localStorage.getItem(MENU_KEY) || 'null') || [{ id: 'bible', name: '성경필사' }],
-    set: d  => localStorage.setItem(MENU_KEY, JSON.stringify(d))
-  };
+  let book = null, chapter = null, editMode = false;
 
   function fmtDate(iso) {
     const d = new Date(iso);
     return `${d.getMonth()+1}월 ${d.getDate()}일`;
   }
 
-  /* ─── 뷰 전환 ─── */
-  function showView(id) {
-    ['view-main','view-bible','view-book'].forEach(v => {
-      const el = document.getElementById(v);
-      el.style.display = v === id ? (v === 'view-book' ? 'block' : 'flex') : 'none';
-    });
-  }
-
-  /* ─── 메인(일상) ─── */
-  function goMain() {
-    showView('view-main');
-    renderMenu();
-  }
-
-  function renderMenu() {
-    const items = menuDB.get();
-    const list  = document.getElementById('menu-list');
-    list.innerHTML = '';
-    items.forEach((item, i) => {
-      const div = document.createElement('div');
-      div.className = 'menu-item';
-      div.innerHTML = `<span class="menu-num">${i + 1}</span>
-                       <span class="menu-name">${item.name}</span>
-                       <span class="menu-arrow">›</span>`;
-      div.onclick = () => openMenuItem(item);
-      list.appendChild(div);
-    });
-  }
-
-  function openMenuItem(item) {
-    if (item.id === 'bible') {
-      showView('view-bible');
-      buildGrid(OT, 'ot-grid');
-      buildGrid(NT, 'nt-grid');
-    } else {
-      alert(`"${item.name}" 준비 중입니다`);
-    }
-  }
-
-  /* 항목 추가 */
-  function toggleAddInput(forceClose = null) {
-    const input   = document.getElementById('add-input');
-    const btnOpen = document.getElementById('btn-add-open');
-    const btnConf = document.getElementById('btn-add-confirm');
-    const isOpen  = input.style.display === 'block';
-    const open    = forceClose === false ? false : !isOpen;
-
-    input.style.display   = open ? 'block' : 'none';
-    btnConf.style.display = open ? 'block' : 'none';
-    btnOpen.style.display = open ? 'none'  : 'flex';
-    if (open) { input.value = ''; input.focus(); }
-  }
-
-  function confirmAdd() {
-    const input = document.getElementById('add-input');
-    const name  = input.value.trim();
-    if (!name) return;
-    const items = menuDB.get();
-    items.push({ id: 'custom_' + Date.now(), name });
-    menuDB.set(items);
-    toggleAddInput(false);
-    renderMenu();
-  }
-
-  /* ─── 성경필사 홈 ─── */
-  function goBible() {
+  function openBible() {
     showView('view-bible');
     buildGrid(OT, 'ot-grid');
     buildGrid(NT, 'nt-grid');
@@ -535,7 +415,7 @@
 
   function buildGrid(books, id) {
     const data = bibleDB.get();
-    const el   = document.getElementById(id);
+    const el = document.getElementById(id);
     el.innerHTML = '';
     books.forEach(b => {
       const btn = document.createElement('button');
@@ -546,10 +426,10 @@
     });
   }
 
-  /* ─── 책 상세 ─── */
   function openBook(b) {
     book = b; chapter = null;
-    showView('view-book');
+    document.getElementById('view-book').style.display = 'block';
+    ['view-main','view-bible','view-daily'].forEach(v => document.getElementById(v).style.display = 'none');
     document.getElementById('sidebar-title').textContent = b;
     showState('empty');
     renderList();
@@ -557,12 +437,9 @@
 
   function renderList() {
     const chapters = bibleDB.get()[book] || {};
-    const list     = document.getElementById('chapter-list');
-    const keys     = Object.keys(chapters);
-    if (!keys.length) {
-      list.innerHTML = '<div class="sidebar-empty">작성한 장이 여기에 나타납니다</div>';
-      return;
-    }
+    const list = document.getElementById('chapter-list');
+    const keys = Object.keys(chapters);
+    if (!keys.length) { list.innerHTML = '<div class="sidebar-empty">작성한 장이 여기에 나타납니다</div>'; return; }
     list.innerHTML = '';
     keys.forEach(ch => {
       const div = document.createElement('div');
@@ -603,9 +480,7 @@
     document.getElementById('input-title').focus();
   }
 
-  function cancelEdit() {
-    chapter ? viewChapter(chapter) : showState('empty');
-  }
+  function cancelEdit() { chapter ? viewChapter(chapter) : showState('empty'); }
 
   function deleteChapter() {
     if (!confirm(`"${chapter}"을 삭제할까요?`)) return;
@@ -623,10 +498,8 @@
     const content = document.getElementById('input-content').value.trim();
     if (!title)   { alert('장 이름을 입력해주세요  예) 1장'); return; }
     if (!content) { alert('내용을 입력해주세요'); return; }
-
     const data = bibleDB.get();
     if (!data[book]) data[book] = {};
-
     let date = new Date().toISOString();
     if (editMode && chapter) {
       if (data[book][chapter]) date = data[book][chapter].date;
@@ -634,14 +507,192 @@
     }
     data[book][title] = { date, content };
     bibleDB.set(data);
-
     chapter = title;
     renderList();
     viewChapter(title);
   }
 
+  /* ════════ 일상 기록 ════════ */
+  const DAILY_KEY = 'daily_habits_v1';
+  const DEFAULT_HABITS = [];
+
+  const dailyDB = {
+    get: () => JSON.parse(localStorage.getItem(DAILY_KEY) || 'null')
+            || { habits: [...DEFAULT_HABITS], records: {} },
+    set: d => localStorage.setItem(DAILY_KEY, JSON.stringify(d))
+  };
+
+  let weekOffset  = 0;
+  let dailyEditMode = false;
+
+  function dateKey(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function getWeekDays(offset) {
+    const now  = new Date();
+    const day  = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1) + offset * 7;
+    const mon  = new Date(now);
+    mon.setDate(diff);
+    mon.setHours(0,0,0,0);
+    return Array.from({length: 7}, (_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d; });
+  }
+
+  function isToday(d) {
+    const t = new Date();
+    return d.getDate() === t.getDate() && d.getMonth() === t.getMonth() && d.getFullYear() === t.getFullYear();
+  }
+
+  function openDaily() {
+    showView('view-daily');
+    weekOffset = 0;
+    dailyEditMode = false;
+    document.getElementById('btn-edit-mode').classList.remove('active');
+    renderDaily();
+  }
+
+  function moveWeek(dir) { weekOffset += dir; renderDaily(); }
+
+  function toggleEditMode() {
+    dailyEditMode = !dailyEditMode;
+    const btn = document.getElementById('btn-edit-mode');
+    btn.classList.toggle('active', dailyEditMode);
+    btn.textContent = dailyEditMode ? '완료' : '편집';
+    renderDaily();
+  }
+
+  function addHabit() {
+    const name = prompt('추가할 항목 이름을 입력하세요');
+    if (!name || !name.trim()) return;
+    const data = dailyDB.get();
+    data.habits.push(name.trim());
+    dailyDB.set(data);
+    renderDaily();
+  }
+
+  function deleteHabit(habit) {
+    if (!confirm(`"${habit}" 항목을 삭제할까요?`)) return;
+    const data = dailyDB.get();
+    data.habits = data.habits.filter(h => h !== habit);
+    // 기록에서도 해당 항목 제거
+    Object.values(data.records).forEach(rec => delete rec[habit]);
+    dailyDB.set(data);
+    renderDaily();
+  }
+
+  function renderDaily() {
+    const data = dailyDB.get();
+    const days = getWeekDays(weekOffset);
+    const wrapper = document.getElementById('table-wrapper');
+
+    // 주 레이블
+    const first = days[0], last = days[6];
+    document.getElementById('week-label').textContent =
+      `${first.getMonth()+1}/${first.getDate()} - ${last.getMonth()+1}/${last.getDate()}`;
+
+    wrapper.innerHTML = '';
+    const table = document.createElement('table');
+    table.className = 'habit-table' + (dailyEditMode ? ' edit-mode' : '');
+
+    /* 헤더 */
+    const thead = table.createTHead();
+    const hRow  = thead.insertRow();
+    const thH   = document.createElement('th');
+    thH.textContent = '항목';
+    thH.className   = 'col-habit';
+    hRow.appendChild(thH);
+    days.forEach(d => {
+      const th = document.createElement('th');
+      th.textContent = `${d.getMonth()+1}/${d.getDate()} ${DAY_KO[d.getDay()]}`;
+      if (isToday(d)) th.classList.add('today-col');
+      hRow.appendChild(th);
+    });
+
+    /* 행 */
+    const tbody = table.createTBody();
+    data.habits.forEach(habit => {
+      const row = tbody.insertRow();
+
+      // 항목명 셀
+      const tdName = row.insertCell();
+      tdName.className = 'habit-name-cell';
+      const inner = document.createElement('div');
+      inner.className = 'habit-name-inner';
+      const nameText = document.createElement('span');
+      nameText.className = 'habit-name-text';
+      nameText.textContent = habit;
+      inner.appendChild(nameText);
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn-del-habit';
+      delBtn.textContent = '×';
+      delBtn.onclick = () => deleteHabit(habit);
+      inner.appendChild(delBtn);
+      tdName.appendChild(inner);
+
+      // 날짜별 셀
+      days.forEach(d => {
+        const key   = dateKey(d);
+        const saved = data.records[key]?.[habit] || {};
+        const checked = saved.checked || false;
+        const text    = saved.text    || '';
+
+        const td = row.insertCell();
+        if (isToday(d)) td.classList.add('today-col');
+
+        // 체크 행
+        const checkRow = document.createElement('div');
+        checkRow.className = 'cell-check-row';
+
+        const chk = document.createElement('input');
+        chk.type      = 'checkbox';
+        chk.className = 'cell-checkbox';
+        chk.checked   = checked;
+
+        const lbl = document.createElement('span');
+        lbl.className = 'cell-check-label' + (checked ? ' done' : '');
+        lbl.textContent = checked ? '완료' : '미완료';
+
+        const save = () => {
+          const d2 = dailyDB.get();
+          if (!d2.records[key]) d2.records[key] = {};
+          const t = textDiv.textContent.trim();
+          if (!chk.checked && !t) delete d2.records[key][habit];
+          else d2.records[key][habit] = { checked: chk.checked, text: t };
+          dailyDB.set(d2);
+        };
+
+        chk.addEventListener('change', () => {
+          lbl.textContent = chk.checked ? '완료' : '미완료';
+          lbl.className   = 'cell-check-label' + (chk.checked ? ' done' : '');
+          save();
+        });
+        checkRow.addEventListener('click', e => {
+          if (e.target !== chk) { chk.checked = !chk.checked; chk.dispatchEvent(new Event('change')); }
+        });
+
+        checkRow.appendChild(chk);
+        checkRow.appendChild(lbl);
+
+        // 텍스트 입력
+        const textDiv = document.createElement('div');
+        textDiv.className       = 'cell-text';
+        textDiv.contentEditable = 'true';
+        textDiv.dataset.placeholder = '메모...';
+        textDiv.textContent     = text;
+        textDiv.addEventListener('blur', save);
+        textDiv.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); textDiv.blur(); } });
+
+        td.appendChild(checkRow);
+        td.appendChild(textDiv);
+      });
+    });
+
+    wrapper.appendChild(table);
+  }
+
   /* ─── 초기화 ─── */
-  goMain();
+  showView('view-main');
 </script>
 </body>
 </html>
