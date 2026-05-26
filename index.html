@@ -220,7 +220,8 @@
       min-height: 52px;
       gap: 4px;
     }
-    .habit-name-text { flex: 1; line-height: 1.4; }
+    .habit-name-text { flex: 1; line-height: 1.4; outline: none; }
+    .edit-mode .habit-name-text { border-bottom: 1px dashed #a8b8ef; cursor: text; }
     .btn-del-habit {
       display: none;
       background: none;
@@ -233,6 +234,29 @@
       flex-shrink: 0;
     }
     .edit-mode .btn-del-habit { display: block; }
+    /* 하루 메모 행 */
+    .memo-row td { background: #f9fbff; }
+    .memo-row td.habit-name-cell { background: #f0f4ff; }
+    .memo-label {
+      padding: 10px 10px 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #7b8fc7;
+      letter-spacing: 0.03em;
+    }
+    .memo-cell-input {
+      min-height: 60px;
+      padding: 10px;
+      font-size: 12px;
+      color: #444;
+      outline: none;
+      line-height: 1.6;
+      font-family: inherit;
+      width: 100%;
+      display: block;
+    }
+    .memo-cell-input:focus { background: #eef3ff; }
+    .memo-cell-input:empty:before { content: attr(data-placeholder); color: #ccc; pointer-events: none; }
     .cell-check-row {
       display: flex;
       align-items: center;
@@ -517,8 +541,12 @@
   const DEFAULT_HABITS = [];
 
   const dailyDB = {
-    get: () => JSON.parse(localStorage.getItem(DAILY_KEY) || 'null')
-            || { habits: [...DEFAULT_HABITS], records: {} },
+    get: () => {
+      const d = JSON.parse(localStorage.getItem(DAILY_KEY) || 'null')
+             || { habits: [...DEFAULT_HABITS], records: {}, memos: {} };
+      if (!d.memos) d.memos = {};
+      return d;
+    },
     set: d => localStorage.setItem(DAILY_KEY, JSON.stringify(d))
   };
 
@@ -575,8 +603,23 @@
     if (!confirm(`"${habit}" 항목을 삭제할까요?`)) return;
     const data = dailyDB.get();
     data.habits = data.habits.filter(h => h !== habit);
-    // 기록에서도 해당 항목 제거
     Object.values(data.records).forEach(rec => delete rec[habit]);
+    dailyDB.set(data);
+    renderDaily();
+  }
+
+  function renameHabit(oldName, newName) {
+    newName = newName.trim();
+    if (!newName || newName === oldName) return;
+    const data = dailyDB.get();
+    const idx = data.habits.indexOf(oldName);
+    if (idx > -1) data.habits[idx] = newName;
+    Object.keys(data.records).forEach(date => {
+      if (data.records[date][oldName] !== undefined) {
+        data.records[date][newName] = data.records[date][oldName];
+        delete data.records[date][oldName];
+      }
+    });
     dailyDB.set(data);
     renderDaily();
   }
@@ -609,8 +652,34 @@
       hRow.appendChild(th);
     });
 
-    /* 행 */
+    /* 하루 메모 행 */
     const tbody = table.createTBody();
+    const memoRow = tbody.insertRow();
+    memoRow.className = 'memo-row';
+    const memoLabel = memoRow.insertCell();
+    memoLabel.className = 'habit-name-cell';
+    memoLabel.innerHTML = '<div class="memo-label">하루 메모</div>';
+    days.forEach(d => {
+      const key = dateKey(d);
+      const memoVal = data.memos[key] || '';
+      const td = memoRow.insertCell();
+      if (isToday(d)) td.classList.add('today-col');
+      const div = document.createElement('div');
+      div.className = 'memo-cell-input';
+      div.contentEditable = 'true';
+      div.dataset.placeholder = '하루를 정리해보세요...';
+      div.textContent = memoVal;
+      div.addEventListener('blur', () => {
+        const d2 = dailyDB.get();
+        const v = div.textContent.trim();
+        if (v) d2.memos[key] = v;
+        else   delete d2.memos[key];
+        dailyDB.set(d2);
+      });
+      td.appendChild(div);
+    });
+
+    /* 습관 행 */
     data.habits.forEach(habit => {
       const row = tbody.insertRow();
 
@@ -622,6 +691,11 @@
       const nameText = document.createElement('span');
       nameText.className = 'habit-name-text';
       nameText.textContent = habit;
+      if (dailyEditMode) {
+        nameText.contentEditable = 'true';
+        nameText.addEventListener('blur', () => renameHabit(habit, nameText.textContent));
+        nameText.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); nameText.blur(); } });
+      }
       inner.appendChild(nameText);
       const delBtn = document.createElement('button');
       delBtn.className = 'btn-del-habit';
