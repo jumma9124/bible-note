@@ -245,7 +245,7 @@
       letter-spacing: 0.03em;
     }
     .memo-cell-input {
-      min-height: 60px;
+      min-height: 80px;
       padding: 10px;
       font-size: 12px;
       color: #444;
@@ -254,6 +254,9 @@
       font-family: inherit;
       width: 100%;
       display: block;
+      word-break: break-all;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
     .memo-cell-input:focus { background: #eef3ff; }
     .memo-cell-input:empty:before { content: attr(data-placeholder); color: #ccc; pointer-events: none; }
@@ -648,6 +651,9 @@
     days.forEach(d => {
       const th = document.createElement('th');
       th.textContent = `${d.getMonth()+1}/${d.getDate()} ${DAY_KO[d.getDay()]}`;
+      th.style.width    = '130px';
+      th.style.minWidth = '130px';
+      th.style.maxWidth = '130px';
       if (isToday(d)) th.classList.add('today-col');
       hRow.appendChild(th);
     });
@@ -668,10 +674,10 @@
       div.className = 'memo-cell-input';
       div.contentEditable = 'true';
       div.dataset.placeholder = '하루를 정리해보세요...';
-      div.textContent = memoVal;
+      if (memoVal) div.innerHTML = memoVal.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
       div.addEventListener('blur', () => {
         const d2 = dailyDB.get();
-        const v = div.textContent.trim();
+        const v = div.innerText.trim();
         if (v) d2.memos[key] = v;
         else   delete d2.memos[key];
         dailyDB.set(d2);
