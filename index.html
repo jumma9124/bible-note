@@ -396,11 +396,14 @@
     .sheet-body { flex: 1; overflow: hidden; }
     .grid-wrap { width: 100%; height: 100%; overflow: auto; position: relative; }
 
-    .sheet-tbl { border-collapse: collapse; table-layout: fixed; }
+    .sheet-tbl { border-collapse: separate; border-spacing: 0; table-layout: fixed; }
 
     .sheet-tbl th {
       background: #f2f4fa;
-      border: 1px solid #dde3f0;
+      border-top: 1px solid #dde3f0;
+      border-right: 1px solid #dde3f0;
+      border-bottom: 1px solid #dde3f0;
+      border-left: none;
       font-size: 12px;
       font-weight: 600;
       color: #666;
@@ -410,6 +413,7 @@
       user-select: none;
       white-space: nowrap;
     }
+    .sheet-tbl th.th-corner { border-left: 1px solid #dde3f0; }
     .sheet-tbl th.th-corner { position: sticky; top: 0; left: 0; z-index: 4; width: 42px; min-width: 42px; cursor: pointer; }
     .sheet-tbl th.th-corner.sel-all { background: #2a4898; color: #fff; }
     .sheet-tbl th.th-corner:hover { background: #e0e6f8; }
@@ -426,7 +430,10 @@
     .sheet-tbl td.sel-row-full { background: #c8d8f8; }
 
     .sheet-tbl td {
-      border: 1px solid #e4e8f5;
+      border-top: none;
+      border-left: none;
+      border-right: 1px solid #e4e8f5;
+      border-bottom: 1px solid #e4e8f5;
       padding: 0;
       height: 24px;
       overflow: hidden;
@@ -438,7 +445,10 @@
       text-align: center;
       font-size: 11px;
       color: #888;
-      border: 1px solid #dde3f0;
+      border-top: none;
+      border-left: 1px solid #dde3f0;
+      border-right: 1px solid #dde3f0;
+      border-bottom: 1px solid #dde3f0;
       position: sticky;
       left: 0;
       z-index: 1;
@@ -1399,20 +1409,10 @@
           else if (typeof dv === 'number') { td.style.textAlign = 'right'; span.style.textAlign = 'right'; }
           if (cell.s) span.style.fontSize = cell.s + 'px';
           if (cell.bd) {
-            const toShadow = (val, x, y) => {
-              if (!val) return null;
-              const thick = val.startsWith('2');
-              const w = thick ? 2 : 1;
-              const col = thick ? '#111' : '#555';
-              return `inset ${x*w}px ${y*w}px 0 0 ${col}`;
-            };
-            const shadows = [
-              toShadow(cell.bd.t,  0,  1),
-              toShadow(cell.bd.b,  0, -1),
-              toShadow(cell.bd.l,  1,  0),
-              toShadow(cell.bd.r, -1,  0),
-            ].filter(Boolean);
-            if (shadows.length) td.style.boxShadow = shadows.join(', ');
+            if (cell.bd.t) td.style.borderTop    = cell.bd.t;
+            if (cell.bd.b) td.style.borderBottom = cell.bd.b;
+            if (cell.bd.l) td.style.borderLeft   = cell.bd.l;
+            if (cell.bd.r) td.style.borderRight  = cell.bd.r;
           }
         } else if (typeof dv === 'number') {
           td.style.textAlign = 'right'; span.style.textAlign = 'right';
@@ -1717,7 +1717,11 @@
       }
       if (!c.bd) c.bd = {};
       if (type === 'all') {
-        c.bd = { t: BD_THIN, b: BD_THIN, l: BD_THIN, r: BD_THIN };
+        c.bd = {};
+        if (p.ri === rMin) c.bd.t = BD_THIN; // 상단 행만 위 테두리
+        c.bd.b = BD_THIN;
+        if (p.ci === cMin) c.bd.l = BD_THIN; // 좌측 열만 왼 테두리
+        c.bd.r = BD_THIN;
       } else if (type === 'outer' || type === 'thick-outer') {
         const s = type === 'thick-outer' ? BD_THICK : BD_THIN;
         if (!c.bd) c.bd = {};
