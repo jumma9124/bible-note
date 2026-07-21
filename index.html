@@ -1233,7 +1233,7 @@
     if (!cell || (cell.v === '' && !cell.f)) return '';
     if (cell.f) return xlEval(cell.f, data, seen);
     const n = parseFloat(cell.v);
-    return isNaN(n) ? cell.v : n;
+    return (!isNaN(n) && String(n) === cell.v.trim()) ? n : cell.v;
   }
 
   function xlEval(formula, data, seen = new Set()) {
