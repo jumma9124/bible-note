@@ -457,6 +457,16 @@
     .sheet-tbl { user-select: none; }
     .sheet-tbl td.cut-cell { outline: 2px dashed #2a4898; outline-offset: -2px; animation: dash-anim 0.6s linear infinite; }
     @keyframes dash-anim { to { outline-offset: 4px; opacity: 0.5; } }
+    .xl-border-wrap { position: relative; display: inline-flex; align-items: center; }
+    .xl-border-drop { position: absolute; top: 100%; left: 0; z-index: 999; background: #fff; border: 1px solid #bbb; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.15); padding: 4px 0; min-width: 160px; display: none; }
+    .xl-border-drop.open { display: block; }
+    .xl-border-drop button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 14px; background: none; border: none; cursor: pointer; font-size: 13px; text-align: left; white-space: nowrap; }
+    .xl-border-drop button:hover { background: #f0f4ff; }
+    .xl-border-drop button .bd-icon { width: 20px; height: 20px; flex-shrink: 0; }
+    @media (prefers-color-scheme: dark) {
+      .xl-border-drop { background: #2a2a2a; border-color: #444; color: #eee; }
+      .xl-border-drop button:hover { background: #3a3a4a; }
+    }
 
     .cell-val {
       display: block;
@@ -622,6 +632,24 @@
     <button class="xl-btn" onclick="xlAddCol()"  title="열 추가">+ 열</button>
     <div class="xl-sep"></div>
     <button class="xl-btn" id="xl-merge" onclick="xlMerge()" title="셀 병합 / 해제">병합</button>
+    <div class="xl-sep"></div>
+    <div class="xl-border-wrap">
+      <button class="xl-btn" onclick="toggleBorderDrop()" title="테두리">테두리 ▾</button>
+      <div class="xl-border-drop" id="xl-border-drop">
+        <button onclick="xlSetBorder('all');closeBorderDrop()">
+          <svg class="bd-icon" viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" fill="none" stroke="#333" stroke-width="1.5"/><line x1="2" y1="10" x2="18" y2="10" stroke="#333" stroke-width="1"/><line x1="10" y1="2" x2="10" y2="18" stroke="#333" stroke-width="1"/></svg>모든 테두리
+        </button>
+        <button onclick="xlSetBorder('outer');closeBorderDrop()">
+          <svg class="bd-icon" viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" fill="none" stroke="#333" stroke-width="1.5"/></svg>바깥 테두리
+        </button>
+        <button onclick="xlSetBorder('thick-outer');closeBorderDrop()">
+          <svg class="bd-icon" viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" fill="none" stroke="#333" stroke-width="3"/></svg>두꺼운 바깥 테두리
+        </button>
+        <button onclick="xlSetBorder('none');closeBorderDrop()">
+          <svg class="bd-icon" viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" fill="none" stroke="#bbb" stroke-width="1" stroke-dasharray="2,2"/></svg>테두리 없음
+        </button>
+      </div>
+    </div>
     <div class="xl-sep"></div>
     <div class="xl-color-wrap" title="셀 배경색">
       <button class="xl-btn xl-color-btn" onclick="document.getElementById('xl-bg-picker').click()" title="배경색 선택">
@@ -1370,6 +1398,12 @@
           if (cell.a) { td.style.textAlign = cell.a; span.style.textAlign = cell.a; }
           else if (typeof dv === 'number') { td.style.textAlign = 'right'; span.style.textAlign = 'right'; }
           if (cell.s) span.style.fontSize = cell.s + 'px';
+          if (cell.bd) {
+            if (cell.bd.t) td.style.borderTop    = cell.bd.t;
+            if (cell.bd.b) td.style.borderBottom = cell.bd.b;
+            if (cell.bd.l) td.style.borderLeft   = cell.bd.l;
+            if (cell.bd.r) td.style.borderRight  = cell.bd.r;
+          }
         } else if (typeof dv === 'number') {
           td.style.textAlign = 'right'; span.style.textAlign = 'right';
         }
@@ -1651,6 +1685,53 @@
     xlDB.set(db); xlRender(); xlSelectHighlight();
   }
 
+  /* ─ 테두리 ─ */
+  const BD_THIN  = '1px solid #555';
+  const BD_THICK = '2px solid #111';
+
+  function xlSetBorder(type) {
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    const refs = xlGetSelRefs(sh);
+    const parsed = refs.map(r => parseRef(r)).filter(Boolean);
+    const rMin = Math.min(...parsed.map(p => p.ri));
+    const rMax = Math.max(...parsed.map(p => p.ri));
+    const cMin = Math.min(...parsed.map(p => p.ci));
+    const cMax = Math.max(...parsed.map(p => p.ci));
+
+    refs.forEach(ref => {
+      const p = parseRef(ref); if (!p) return;
+      if (!sh.data[ref]) sh.data[ref] = { v: '', f: '' };
+      const c = sh.data[ref];
+      if (type === 'none') {
+        delete c.bd; xlCleanCell(sh, ref); return;
+      }
+      if (!c.bd) c.bd = {};
+      if (type === 'all') {
+        c.bd = { t: BD_THIN, b: BD_THIN, l: BD_THIN, r: BD_THIN };
+      } else if (type === 'outer' || type === 'thick-outer') {
+        const s = type === 'thick-outer' ? BD_THICK : BD_THIN;
+        if (!c.bd) c.bd = {};
+        if (p.ri === rMin) c.bd.t = s; else delete c.bd.t;
+        if (p.ri === rMax) c.bd.b = s; else delete c.bd.b;
+        if (p.ci === cMin) c.bd.l = s; else delete c.bd.l;
+        if (p.ci === cMax) c.bd.r = s; else delete c.bd.r;
+        if (!c.bd.t && !c.bd.b && !c.bd.l && !c.bd.r) delete c.bd;
+        xlCleanCell(sh, ref); return;
+      }
+    });
+    xlDB.set(db); xlRender(); xlSelectHighlight();
+  }
+
+  function toggleBorderDrop() {
+    document.getElementById('xl-border-drop').classList.toggle('open');
+  }
+  function closeBorderDrop() {
+    document.getElementById('xl-border-drop').classList.remove('open');
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.xl-border-wrap')) closeBorderDrop();
+  });
+
   /* ─ 편집 시작 ─ */
   function xlStartEdit(ref, prefill) {
     xlSel = ref.toUpperCase();
@@ -1715,7 +1796,7 @@
   /* ─ 서식 ─ */
   function xlCleanCell(sh, ref) {
     const c = sh.data[ref];
-    if (c && !c.v && !c.f && !c.b && !c.i && !c.a && !c.s && !c.bg && !c.tc) delete sh.data[ref];
+    if (c && !c.v && !c.f && !c.b && !c.i && !c.a && !c.s && !c.bg && !c.tc && !c.bd) delete sh.data[ref];
   }
 
   function xlGetSelRefs(sh) {
