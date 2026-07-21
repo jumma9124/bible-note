@@ -453,7 +453,9 @@
       outline-offset: -2px;
       background: #eef3ff;
     }
-    .sheet-tbl td.in-range { background: #e8f0fe; }
+    .sheet-tbl td.in-range { background: #dce8fd; }
+    .sheet-tbl td.cut-cell { outline: 2px dashed #2a4898; outline-offset: -2px; animation: dash-anim 0.6s linear infinite; }
+    @keyframes dash-anim { to { outline-offset: 4px; opacity: 0.5; } }
 
     .cell-val {
       display: block;
@@ -1127,6 +1129,9 @@
   let xlSelCol = null;
   let xlSelRow = null;
   let xlSelAll = false;
+  let xlRangeStart = null; // 범위 선택 시작
+  let xlRangeEnd   = null; // 범위 선택 끝
+  let xlClipboard  = null; // { cells:[{dr,dc,data}], rowCount, colCount, type, origRefs }
 
   /* ─ 열 이름 변환 ─ */
   function colLetter(n) { // n: 0-indexed → 'A','B',...
@@ -1144,6 +1149,15 @@
     if (!m) return null;
     return { col: m[1], row: parseInt(m[2]), ci: colIdx(m[1]), ri: parseInt(m[2]) - 1 };
   }
+  function xlRangeBounds() {
+    const s = parseRef(xlRangeStart || xlSel);
+    const e = parseRef(xlRangeEnd   || xlSel);
+    if (!s || !e) return null;
+    return { rMin: Math.min(s.ri,e.ri), rMax: Math.max(s.ri,e.ri),
+             cMin: Math.min(s.ci,e.ci), cMax: Math.max(s.ci,e.ci) };
+  }
+  function xlHasRange() { return xlRangeStart && xlRangeEnd && xlRangeStart !== xlRangeEnd; }
+
   function rangeCells(from, to) {
     const f = parseRef(from), t = parseRef(to);
     if (!f || !t) return [];
@@ -1317,6 +1331,8 @@
         if (xlSelAll || xlSelCol === c) td.classList.add('sel-col-full');
         if (!xlSelAll && xlSelRow === r) td.classList.add('sel-row-full');
         if (sel && sel.ci === c && sel.ri === r) td.classList.add('sel');
+        if (xlHasRange()) { const b=xlRangeBounds(); if (r>=b.rMin&&r<=b.rMax&&c>=b.cMin&&c<=b.cMax) td.classList.add('in-range'); }
+        if (xlClipboard && xlClipboard.type==='cut' && xlClipboard.origRefs && xlClipboard.origRefs.includes(ref)) td.classList.add('cut-cell');
 
         const span = document.createElement('span');
         span.className = 'cell-val';
@@ -1335,7 +1351,18 @@
         }
 
         td.appendChild(span);
-        td.addEventListener('click', (e) => { e.stopPropagation(); if (xlEditing) xlCommit(); xlSelect(ref); });
+        td.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (xlEditing) xlCommit();
+          if (e.shiftKey) {
+            if (!xlRangeStart) xlRangeStart = xlSel;
+            xlRangeEnd = ref;
+            xlSelCol = null; xlSelRow = null; xlSelAll = false;
+            xlRender(); xlSelectHighlight();
+          } else {
+            xlSelect(ref);
+          }
+        });
         td.addEventListener('dblclick', (e) => { e.stopPropagation(); xlStartEdit(ref); });
       }
     }
@@ -1397,6 +1424,7 @@
     db.active = idx;
     xlDB.set(db);
     xlSel = 'A1'; xlSelCol = null; xlSelRow = null; xlSelAll = false;
+    xlRangeStart = null; xlRangeEnd = null; xlClipboard = null;
     xlRender();
     xlSelectHighlight();
   }
@@ -1469,6 +1497,8 @@
     xlSelCol = null;
     xlSelRow = null;
     xlSelAll = false;
+    xlRangeStart = null;
+    xlRangeEnd = null;
     xlSel = ref.toUpperCase();
     xlRender();
     xlSelectHighlight();
@@ -1480,6 +1510,7 @@
     xlSelRow = null;
     xlSelAll = false;
     xlEditing = false;
+    xlRangeStart = null; xlRangeEnd = null;
     xlSel = colLetter(c) + '1';
     xlRender();
     xlSelectHighlight();
@@ -1491,6 +1522,7 @@
     xlSelCol = null;
     xlSelAll = false;
     xlEditing = false;
+    xlRangeStart = null; xlRangeEnd = null;
     xlSel = 'A' + (r + 1);
     xlRender();
     xlSelectHighlight();
@@ -1502,9 +1534,48 @@
     xlSelCol = null;
     xlSelRow = null;
     xlEditing = false;
+    xlRangeStart = null; xlRangeEnd = null;
     xlSel = 'A1';
     xlRender();
     xlSelectHighlight();
+  }
+
+  /* ─ 복사 / 잘라내기 ─ */
+  function xlCopy(type) {
+    const { sh } = xlDB.sh();
+    const refs = xlGetSelRefs(sh);
+    if (!refs.length) return;
+    const parsed = refs.map(r => ({ ref: r, p: parseRef(r) })).filter(x => x.p);
+    const rMin = Math.min(...parsed.map(x => x.p.ri));
+    const cMin = Math.min(...parsed.map(x => x.p.ci));
+    const rMax = Math.max(...parsed.map(x => x.p.ri));
+    const cMax = Math.max(...parsed.map(x => x.p.ci));
+    xlClipboard = {
+      cells: parsed.map(({ ref, p }) => ({ dr: p.ri - rMin, dc: p.ci - cMin, data: sh.data[ref] ? { ...sh.data[ref] } : null })),
+      rowCount: rMax - rMin + 1, colCount: cMax - cMin + 1,
+      type, origRefs: refs
+    };
+    xlRender(); xlSelectHighlight();
+  }
+
+  /* ─ 붙여넣기 ─ */
+  function xlPaste() {
+    if (!xlClipboard) return;
+    const dest = parseRef(xlSel);
+    if (!dest) return;
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    xlClipboard.cells.forEach(({ dr, dc, data }) => {
+      const r = dest.ri + dr, c = dest.ci + dc;
+      if (r >= sh.rows || c >= sh.cols) return;
+      const ref = colLetter(c) + (r + 1);
+      if (data) sh.data[ref] = { ...data };
+      else delete sh.data[ref];
+    });
+    if (xlClipboard.type === 'cut') {
+      xlClipboard.origRefs.forEach(ref => { delete sh.data[ref]; });
+      xlClipboard = null;
+    }
+    xlDB.set(db); xlRender(); xlSelectHighlight();
   }
 
   /* ─ 편집 시작 ─ */
@@ -1584,6 +1655,13 @@
       return Array.from({length: sh.rows}, (_, r) => colLetter(xlSelCol) + (r + 1));
     if (xlSelRow !== null)
       return Array.from({length: sh.cols}, (_, c) => colLetter(c) + (xlSelRow + 1));
+    if (xlHasRange()) {
+      const b = xlRangeBounds(); const refs = [];
+      for (let r = b.rMin; r <= b.rMax; r++)
+        for (let c = b.cMin; c <= b.cMax; c++)
+          refs.push(colLetter(c) + (r + 1));
+      return refs;
+    }
     return [xlSel];
   }
 
@@ -1684,13 +1762,19 @@
       case 'Delete': case 'Backspace':
         e.preventDefault();
         const db=xlDB.get(); const sh=db.sheets[db.active];
-        if (sh.data[xlSel]) { sh.data[xlSel].v=''; sh.data[xlSel].f=''; const c=sh.data[xlSel]; if(!c.b&&!c.i&&!c.a&&!c.s) delete sh.data[xlSel]; xlDB.set(db); xlRender(); xlSelectHighlight(); }
+        xlGetSelRefs(sh).forEach(dref => {
+          if (sh.data[dref]) { sh.data[dref].v=''; sh.data[dref].f=''; const cc=sh.data[dref]; if(!cc.b&&!cc.i&&!cc.a&&!cc.s&&!cc.bg&&!cc.tc) delete sh.data[dref]; }
+        });
+        xlDB.set(db); xlRender(); xlSelectHighlight();
         break;
       default:
         if (e.key.length===1 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); xlStartEdit(xlSel, e.key); }
     }
     if ((e.ctrlKey||e.metaKey) && e.key==='b') { e.preventDefault(); xlFormat('b'); }
     if ((e.ctrlKey||e.metaKey) && e.key==='i') { e.preventDefault(); xlFormat('i'); }
+    if ((e.ctrlKey||e.metaKey) && e.key==='x') { e.preventDefault(); xlCopy('cut'); }
+    if ((e.ctrlKey||e.metaKey) && e.key==='c') { e.preventDefault(); xlCopy('copy'); }
+    if ((e.ctrlKey||e.metaKey) && e.key==='v') { e.preventDefault(); xlPaste(); }
   });
 
   /* ─ 수식 바 Enter ─ */
