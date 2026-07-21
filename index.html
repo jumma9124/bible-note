@@ -453,7 +453,8 @@
       outline-offset: -2px;
       background: #eef3ff;
     }
-    .sheet-tbl td.in-range { background: #dce8fd; }
+    .sheet-tbl td.in-range { background: #dce8fd !important; }
+    .sheet-tbl { user-select: none; }
     .sheet-tbl td.cut-cell { outline: 2px dashed #2a4898; outline-offset: -2px; animation: dash-anim 0.6s linear infinite; }
     @keyframes dash-anim { to { outline-offset: 4px; opacity: 0.5; } }
 
@@ -1132,6 +1133,7 @@
   let xlRangeStart = null; // 범위 선택 시작
   let xlRangeEnd   = null; // 범위 선택 끝
   let xlClipboard  = null; // { cells:[{dr,dc,data}], rowCount, colCount, type, origRefs }
+  let xlIsDragging = false;
 
   /* ─ 열 이름 변환 ─ */
   function colLetter(n) { // n: 0-indexed → 'A','B',...
@@ -1351,8 +1353,9 @@
         }
 
         td.appendChild(span);
-        td.addEventListener('click', (e) => {
-          e.stopPropagation();
+        td.addEventListener('mousedown', (e) => {
+          if (e.button !== 0) return;
+          e.preventDefault();
           if (xlEditing) xlCommit();
           if (e.shiftKey) {
             if (!xlRangeStart) xlRangeStart = xlSel;
@@ -1360,8 +1363,20 @@
             xlSelCol = null; xlSelRow = null; xlSelAll = false;
             xlRender(); xlSelectHighlight();
           } else {
-            xlSelect(ref);
+            xlIsDragging = true;
+            xlRangeStart = ref;
+            xlRangeEnd = null;
+            xlSel = ref;
+            xlSelCol = null; xlSelRow = null; xlSelAll = false;
+            xlRender(); xlSelectHighlight();
           }
+        });
+        td.addEventListener('mouseenter', () => {
+          if (!xlIsDragging) return;
+          if (ref === xlRangeEnd) return;
+          xlRangeEnd = ref;
+          xlSel = xlRangeStart;
+          xlRender(); xlSelectHighlight();
         });
         td.addEventListener('dblclick', (e) => { e.stopPropagation(); xlStartEdit(ref); });
       }
@@ -1776,6 +1791,8 @@
     if ((e.ctrlKey||e.metaKey) && e.key==='c') { e.preventDefault(); xlCopy('copy'); }
     if ((e.ctrlKey||e.metaKey) && e.key==='v') { e.preventDefault(); xlPaste(); }
   });
+
+  document.addEventListener('mouseup', () => { xlIsDragging = false; });
 
   /* ─ 수식 바 Enter ─ */
   document.getElementById('xl-formula').addEventListener('keydown', e => {
