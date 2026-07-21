@@ -1711,10 +1711,10 @@
       } else if (type === 'outer' || type === 'thick-outer') {
         const s = type === 'thick-outer' ? BD_THICK : BD_THIN;
         if (!c.bd) c.bd = {};
-        if (p.ri === rMin) c.bd.t = s; else delete c.bd.t;
-        if (p.ri === rMax) c.bd.b = s; else delete c.bd.b;
-        if (p.ci === cMin) c.bd.l = s; else delete c.bd.l;
-        if (p.ci === cMax) c.bd.r = s; else delete c.bd.r;
+        if (p.ri === rMin) c.bd.t = s;
+        if (p.ri === rMax) c.bd.b = s;
+        if (p.ci === cMin) c.bd.l = s;
+        if (p.ci === cMax) c.bd.r = s;
         if (!c.bd.t && !c.bd.b && !c.bd.l && !c.bd.r) delete c.bd;
         xlCleanCell(sh, ref); return;
       }
