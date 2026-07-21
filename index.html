@@ -297,6 +297,202 @@
     .habit-table tr:hover td { background: #fafcff; }
     .habit-table tr:hover td.habit-name-cell { background: #f4f6ff; }
     .habit-table td.today-col { background: #f8faff; }
+
+    /* ───────── 재무관리 ───────── */
+    #view-finance {
+      height: 100vh;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      padding-bottom: 20px;
+    }
+    .finance-menu { padding: 0 48px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ───────── 엑셀 ───────── */
+    #view-excel { height: 100vh; display: none; flex-direction: column; }
+
+    .excel-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      background: #fff;
+      border-bottom: 1px solid #dde3f0;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .xl-sep { width: 1px; height: 20px; background: #dde3f0; margin: 0 4px; flex-shrink: 0; }
+    .xl-btn {
+      padding: 4px 8px;
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #333;
+      min-width: 28px;
+      font-family: inherit;
+    }
+    .xl-btn:hover { background: #f0f3ff; border-color: #c0cae8; }
+    .xl-btn.active { background: #dce6ff; border-color: #a0b4e8; color: #2a4898; }
+    .xl-btn.bold { font-weight: 700; }
+    .xl-btn.italic { font-style: italic; }
+    .xl-size-sel {
+      padding: 3px 4px;
+      border: 1px solid #dce3f5;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: inherit;
+      color: #333;
+      background: #fff;
+      cursor: pointer;
+      outline: none;
+      width: 56px;
+    }
+    .xl-size-sel:focus { border-color: #2a4898; }
+
+    .formula-bar {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 200px;
+      margin-left: 4px;
+    }
+    .cell-addr {
+      width: 56px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      border: 1px solid #dce3f5;
+      border-radius: 4px 0 0 4px;
+      padding: 4px 6px;
+      background: #f8f9ff;
+      flex-shrink: 0;
+    }
+    .fx-label {
+      padding: 4px 7px;
+      font-size: 11px;
+      color: #999;
+      border-top: 1px solid #dce3f5;
+      border-bottom: 1px solid #dce3f5;
+      background: #f8f9ff;
+      font-style: italic;
+      flex-shrink: 0;
+    }
+    .formula-input {
+      flex: 1;
+      padding: 4px 8px;
+      border: 1px solid #dce3f5;
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      background: #fff;
+    }
+    .formula-input:focus { border-color: #2a4898; }
+
+    .sheet-body { flex: 1; overflow: hidden; }
+    .grid-wrap { width: 100%; height: 100%; overflow: auto; position: relative; }
+
+    .sheet-tbl { border-collapse: collapse; table-layout: fixed; }
+
+    .sheet-tbl th {
+      background: #f2f4fa;
+      border: 1px solid #dde3f0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      text-align: center;
+      padding: 3px 4px;
+      height: 24px;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .sheet-tbl th.th-corner { position: sticky; top: 0; left: 0; z-index: 4; width: 42px; min-width: 42px; }
+    .sheet-tbl th.th-col   { position: sticky; top: 0; z-index: 3; }
+    .sheet-tbl th.th-col.sel-col { background: #c8d8f8; color: #1a3570; }
+
+    .sheet-tbl td {
+      border: 1px solid #e4e8f5;
+      padding: 0;
+      height: 24px;
+      overflow: hidden;
+      cursor: cell;
+      vertical-align: middle;
+    }
+    .sheet-tbl td.td-rh {
+      background: #f2f4fa;
+      text-align: center;
+      font-size: 11px;
+      color: #888;
+      border: 1px solid #dde3f0;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      cursor: default;
+      width: 42px;
+      min-width: 42px;
+      padding: 0 4px;
+    }
+    .sheet-tbl td.td-rh.sel-row { background: #c8d8f8; color: #1a3570; font-weight: 600; }
+    .sheet-tbl td.sel {
+      outline: 2px solid #2a4898;
+      outline-offset: -2px;
+      background: #eef3ff;
+    }
+    .sheet-tbl td.in-range { background: #e8f0fe; }
+
+    .cell-val {
+      display: block;
+      padding: 2px 5px;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      height: 100%;
+      line-height: 20px;
+    }
+    .cell-edit-input {
+      width: 100%;
+      height: 100%;
+      border: none;
+      outline: 2px solid #2a4898;
+      outline-offset: -1px;
+      padding: 2px 5px;
+      font-size: 13px;
+      font-family: inherit;
+      background: #fff;
+      display: block;
+      box-sizing: border-box;
+    }
+
+    .sheet-footer {
+      display: flex;
+      align-items: center;
+      background: #edf0f8;
+      border-top: 1px solid #dde3f0;
+      padding: 0 8px;
+      height: 26px;
+      flex-shrink: 0;
+      gap: 4px;
+    }
+    .sheet-tab {
+      padding: 3px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      color: #777;
+      background: transparent;
+    }
+    .sheet-tab.active {
+      background: #fff;
+      border-color: #dde3f0;
+      color: #2a4898;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -315,6 +511,70 @@
       <span class="menu-name">일상</span>
       <span class="menu-arrow">›</span>
     </div>
+    <div class="menu-item" onclick="openFinance()">
+      <span class="menu-num">3</span>
+      <span class="menu-name">재무관리</span>
+      <span class="menu-arrow">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- ───── 재무관리 ───── -->
+<div id="view-finance">
+  <div class="view-header">
+    <button class="btn-back" onclick="goMain()">← 일상</button>
+    <div class="view-h-title">재무관리</div>
+  </div>
+  <div class="finance-menu">
+    <div class="menu-item" onclick="openExcel()">
+      <span class="menu-num">1</span>
+      <span class="menu-name">엑셀</span>
+      <span class="menu-arrow">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- ───── 엑셀 ───── -->
+<div id="view-excel">
+  <div class="excel-toolbar">
+    <button class="btn-back xl-btn" onclick="openFinance()" style="margin-right:4px">← 재무관리</button>
+    <div class="xl-sep"></div>
+    <button class="xl-btn bold" id="xl-bold" onclick="xlFormat('b')" title="굵게 (Ctrl+B)">B</button>
+    <button class="xl-btn italic" id="xl-italic" onclick="xlFormat('i')" title="기울임 (Ctrl+I)">I</button>
+    <div class="xl-sep"></div>
+    <button class="xl-btn" id="xl-left"   onclick="xlAlign('left')"   title="왼쪽 정렬">좌</button>
+    <button class="xl-btn" id="xl-center" onclick="xlAlign('center')" title="가운데 정렬">중</button>
+    <button class="xl-btn" id="xl-right"  onclick="xlAlign('right')"  title="오른쪽 정렬">우</button>
+    <div class="xl-sep"></div>
+    <select class="xl-size-sel" id="xl-size" onchange="xlSetSize(this.value)" title="글씨 크기">
+      <option value="">크기</option>
+      <option value="10">10</option>
+      <option value="11">11</option>
+      <option value="12">12</option>
+      <option value="13">13</option>
+      <option value="14">14</option>
+      <option value="16">16</option>
+      <option value="18">18</option>
+      <option value="20">20</option>
+      <option value="24">24</option>
+      <option value="28">28</option>
+      <option value="32">32</option>
+    </select>
+    <div class="xl-sep"></div>
+    <button class="xl-btn" onclick="xlAddRow()"  title="행 추가">+ 행</button>
+    <button class="xl-btn" onclick="xlAddCol()"  title="열 추가">+ 열</button>
+    <div class="xl-sep"></div>
+    <div class="formula-bar">
+      <div class="cell-addr" id="xl-addr">A1</div>
+      <div class="fx-label">fx</div>
+      <input class="formula-input" id="xl-formula" placeholder="값 또는 수식  예) =SUM(A1:A5)" />
+    </div>
+  </div>
+  <div class="sheet-body">
+    <div class="grid-wrap" id="xl-grid"></div>
+  </div>
+  <div class="sheet-footer">
+    <div class="sheet-tab active">Sheet 1</div>
   </div>
 </div>
 
@@ -412,7 +672,7 @@
   const DAY_KO = ['일','월','화','수','목','금','토'];
 
   function showView(id) {
-    ['view-main','view-bible','view-book','view-daily'].forEach(v => {
+    ['view-main','view-bible','view-book','view-daily','view-finance','view-excel'].forEach(v => {
       const el = document.getElementById(v);
       el.style.display = (v === id) ? 'flex' : 'none';
       if (v === 'view-book' && v === id) el.style.display = 'block';
@@ -769,6 +1029,351 @@
     });
 
     wrapper.appendChild(table);
+  }
+
+  /* ════════ 재무관리 ════════ */
+  function openFinance() { showView('view-finance'); }
+
+  /* ════════ 엑셀 ════════ */
+  const XL_KEY = 'xl_data_v1';
+  const XL_DEFAULT_ROWS = 50;
+  const XL_DEFAULT_COLS = 15;
+
+  const xlDB = {
+    get: () => JSON.parse(localStorage.getItem(XL_KEY) || 'null')
+            || { data: {}, rows: XL_DEFAULT_ROWS, cols: XL_DEFAULT_COLS, colW: {} },
+    set: d => localStorage.setItem(XL_KEY, JSON.stringify(d))
+  };
+
+  let xlSel = 'A1';
+  let xlEditing = false;
+
+  /* ─ 열 이름 변환 ─ */
+  function colLetter(n) { // n: 0-indexed → 'A','B',...
+    let s = '', x = n + 1;
+    while (x > 0) { x--; s = String.fromCharCode(65 + x % 26) + s; x = Math.floor(x / 26); }
+    return s;
+  }
+  function colIdx(letter) { // 'A'→0, 'B'→1
+    let n = 0;
+    for (let i = 0; i < letter.length; i++) n = n * 26 + letter.charCodeAt(i) - 64;
+    return n - 1;
+  }
+  function parseRef(ref) {
+    const m = ref.toUpperCase().match(/^([A-Z]+)(\d+)$/);
+    if (!m) return null;
+    return { col: m[1], row: parseInt(m[2]), ci: colIdx(m[1]), ri: parseInt(m[2]) - 1 };
+  }
+  function rangeCells(from, to) {
+    const f = parseRef(from), t = parseRef(to);
+    if (!f || !t) return [];
+    const out = [];
+    for (let r = Math.min(f.row,t.row); r <= Math.max(f.row,t.row); r++)
+      for (let c = Math.min(f.ci,t.ci); c <= Math.max(f.ci,t.ci); c++)
+        out.push(colLetter(c) + r);
+    return out;
+  }
+
+  /* ─ 수식 계산 ─ */
+  function xlCellVal(ref, data, seen = new Set()) {
+    ref = ref.toUpperCase();
+    if (seen.has(ref)) return '#순환!';
+    seen.add(ref);
+    const cell = data[ref];
+    if (!cell || (cell.v === '' && !cell.f)) return '';
+    if (cell.f) return xlEval(cell.f, data, seen);
+    const n = parseFloat(cell.v);
+    return isNaN(n) ? cell.v : n;
+  }
+
+  function xlEval(formula, data, seen = new Set()) {
+    if (!formula.startsWith('=')) return formula;
+    let e = formula.slice(1).trim().toUpperCase();
+
+    const FN = {
+      SUM:     vs => vs.reduce((a,b)=>a+(+b||0), 0),
+      AVERAGE: vs => { const ns=vs.map(Number).filter(n=>!isNaN(n)); return ns.length?ns.reduce((a,b)=>a+b)/ns.length:0; },
+      AVG:     vs => { const ns=vs.map(Number).filter(n=>!isNaN(n)); return ns.length?ns.reduce((a,b)=>a+b)/ns.length:0; },
+      MIN:     vs => { const ns=vs.map(Number).filter(n=>!isNaN(n)); return ns.length?Math.min(...ns):0; },
+      MAX:     vs => { const ns=vs.map(Number).filter(n=>!isNaN(n)); return ns.length?Math.max(...ns):0; },
+      COUNT:   vs => vs.filter(v=>v!==''&&!isNaN(+v)).length,
+      COUNTA:  vs => vs.filter(v=>v!=='').length,
+      ABS:     vs => Math.abs(+vs[0]||0),
+      ROUND:   vs => +( (+vs[0]||0).toFixed(+vs[1]||0) ),
+      SQRT:    vs => Math.sqrt(+vs[0]||0),
+      INT:     vs => Math.floor(+vs[0]||0),
+    };
+
+    // Expand ranges in function args, then apply function
+    e = e.replace(new RegExp('\\b(' + Object.keys(FN).join('|') + ')\\(([^)]+)\\)', 'g'), (_, fn, args) => {
+      const vals = args.split(',').flatMap(a => {
+        a = a.trim();
+        const rm = a.match(/^([A-Z]+\d+):([A-Z]+\d+)$/);
+        if (rm) return rangeCells(rm[1], rm[2]).map(r => { const v = xlCellVal(r, data, new Set(seen)); return v===''?'0':isNaN(+v)?'0':+v; });
+        const cm = a.match(/^([A-Z]+\d+)$/);
+        if (cm) { const v = xlCellVal(a, data, new Set(seen)); return [v===''?0:isNaN(+v)?0:+v]; }
+        return [isNaN(+a)?0:+a];
+      });
+      const result = FN[fn] ? FN[fn](vals) : 0;
+      return isNaN(result)||!isFinite(result) ? 0 : result;
+    });
+
+    // IF(cond, t, f)
+    e = e.replace(/IF\(([^,]+),([^,]+),([^)]+)\)/g, (_, cond, tv, fv) => {
+      try { return Function('"use strict";return (' + cond + ')')() ? tv.trim() : fv.trim(); }
+      catch { return fv.trim(); }
+    });
+
+    // Replace remaining cell refs
+    e = e.replace(/[A-Z]+\d+/g, ref => {
+      const v = xlCellVal(ref, data, new Set(seen));
+      if (v === '' || v == null) return '0';
+      return isNaN(+v) ? `"${String(v).replace(/"/g,'\\"')}"` : +v;
+    });
+
+    try {
+      const r = Function('"use strict";return (' + e + ')')();
+      if (typeof r === 'number') { if (!isFinite(r)) return '#DIV/0!'; return +r.toPrecision(10).replace(/\.?0+$/,''); }
+      return r;
+    } catch { return '#오류!'; }
+  }
+
+  function xlDisplay(ref, data) {
+    const v = xlCellVal(ref, data);
+    if (v === '' || v == null) return '';
+    if (typeof v === 'number') return +v.toPrecision(10).replace(/\.?0+$/,'');
+    return v;
+  }
+
+  /* ─ 렌더링 ─ */
+  function xlRender() {
+    const d = xlDB.get();
+    const { data, rows, cols } = d;
+    const sel = parseRef(xlSel);
+    const wrap = document.getElementById('xl-grid');
+    wrap.innerHTML = '';
+
+    const tbl = document.createElement('table');
+    tbl.className = 'sheet-tbl';
+
+    // Header row
+    const thead = tbl.createTHead();
+    const hr = thead.insertRow();
+    const corner = document.createElement('th');
+    corner.className = 'th-corner';
+    hr.appendChild(corner);
+    for (let c = 0; c < cols; c++) {
+      const th = document.createElement('th');
+      th.className = 'th-col' + (sel && sel.ci === c ? ' sel-col' : '');
+      th.textContent = colLetter(c);
+      const w = d.colW[colLetter(c)] || 100;
+      th.style.width = th.style.minWidth = w + 'px';
+      hr.appendChild(th);
+    }
+
+    // Body
+    const tbody = tbl.createTBody();
+    for (let r = 0; r < rows; r++) {
+      const row = tbody.insertRow();
+      const rh = row.insertCell();
+      rh.className = 'td-rh' + (sel && sel.ri === r ? ' sel-row' : '');
+      rh.textContent = r + 1;
+
+      for (let c = 0; c < cols; c++) {
+        const ref = colLetter(c) + (r + 1);
+        const cell = data[ref];
+        const td = row.insertCell();
+        td.dataset.ref = ref;
+        if (sel && sel.ci === c && sel.ri === r) td.classList.add('sel');
+
+        const span = document.createElement('span');
+        span.className = 'cell-val';
+        const dv = xlDisplay(ref, data);
+        span.textContent = dv !== null && dv !== undefined ? dv : '';
+        if (cell) {
+          if (cell.b) span.style.fontWeight = 'bold';
+          if (cell.i) span.style.fontStyle = 'italic';
+          if (cell.a) span.style.textAlign = cell.a;
+          else if (typeof dv === 'number') span.style.textAlign = 'right';
+          if (cell.s) { span.style.fontSize = cell.s + 'px'; td.style.height = Math.max(24, parseInt(cell.s) + 8) + 'px'; }
+        } else if (typeof dv === 'number') {
+          span.style.textAlign = 'right';
+        }
+
+        td.appendChild(span);
+        td.addEventListener('click', (e) => { e.stopPropagation(); if (xlEditing) xlCommit(); xlSelect(ref); });
+        td.addEventListener('dblclick', (e) => { e.stopPropagation(); xlStartEdit(ref); });
+      }
+    }
+
+    tbl.appendChild(tbody);
+    wrap.appendChild(tbl);
+    xlScrollToSel();
+  }
+
+  function xlScrollToSel() {
+    const td = document.querySelector(`.sheet-tbl td[data-ref="${xlSel}"]`);
+    if (td) td.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }
+
+  /* ─ 셀 선택 ─ */
+  function xlSelect(ref) {
+    xlEditing = false;
+    xlSel = ref.toUpperCase();
+    const d = xlDB.get();
+    const cell = d.data[xlSel];
+    document.getElementById('xl-addr').textContent = xlSel;
+    document.getElementById('xl-formula').value = cell ? (cell.f || (cell.v ?? '')) : '';
+    document.getElementById('xl-bold').classList.toggle('active', !!(cell&&cell.b));
+    document.getElementById('xl-italic').classList.toggle('active', !!(cell&&cell.i));
+    // Re-render to update selection highlight
+    xlRender();
+  }
+
+  /* ─ 편집 시작 ─ */
+  function xlStartEdit(ref, prefill) {
+    xlSel = ref.toUpperCase();
+    xlEditing = true;
+    const td = document.querySelector(`.sheet-tbl td[data-ref="${xlSel}"]`);
+    if (!td) return;
+
+    td.innerHTML = '';
+    const inp = document.createElement('input');
+    inp.className = 'cell-edit-input';
+    inp.id = 'xl-cell-inp';
+    const d = xlDB.get();
+    const cell = d.data[xlSel];
+    inp.value = prefill !== undefined ? prefill : (cell ? (cell.f || (cell.v ?? '')) : '');
+    td.appendChild(inp);
+    inp.focus();
+    if (prefill === undefined) inp.select();
+
+    document.getElementById('xl-addr').textContent = xlSel;
+    document.getElementById('xl-formula').value = inp.value;
+
+    inp.addEventListener('input', () => {
+      document.getElementById('xl-formula').value = inp.value;
+    });
+    inp.addEventListener('blur', () => { if (xlEditing) xlCommit(); });
+  }
+
+  /* ─ 저장 ─ */
+  function xlCommit() {
+    xlEditing = false;
+    const inp = document.getElementById('xl-cell-inp');
+    if (!inp) return;
+    const val = inp.value;
+    const d = xlDB.get();
+    if (!d.data[xlSel]) d.data[xlSel] = {};
+    if (val.startsWith('=')) { d.data[xlSel].f = val; d.data[xlSel].v = ''; }
+    else { d.data[xlSel].v = val; d.data[xlSel].f = ''; }
+    // Clean up empty cells with no formatting
+    const c = d.data[xlSel];
+    if (!val && !c.b && !c.i && !c.a) delete d.data[xlSel];
+    xlDB.set(d);
+    xlRender();
+    xlSelectHighlight();
+  }
+
+  function xlSelectHighlight() {
+    const d = xlDB.get();
+    const cell = d.data[xlSel];
+    document.getElementById('xl-addr').textContent = xlSel;
+    document.getElementById('xl-formula').value = cell ? (cell.f || (cell.v ?? '')) : '';
+    document.getElementById('xl-bold').classList.toggle('active',   !!(cell&&cell.b));
+    document.getElementById('xl-italic').classList.toggle('active', !!(cell&&cell.i));
+    document.getElementById('xl-left').classList.toggle('active',   !!(cell&&cell.a==='left'));
+    document.getElementById('xl-center').classList.toggle('active', !!(cell&&cell.a==='center'));
+    document.getElementById('xl-right').classList.toggle('active',  !!(cell&&cell.a==='right'));
+    document.getElementById('xl-size').value = (cell&&cell.s) ? cell.s : '';
+  }
+
+  /* ─ 서식 ─ */
+  function xlFormat(prop) {
+    const d = xlDB.get();
+    if (!d.data[xlSel]) d.data[xlSel] = { v: '', f: '' };
+    d.data[xlSel][prop] = !d.data[xlSel][prop];
+    xlDB.set(d);
+    xlRender(); xlSelectHighlight();
+  }
+  function xlAlign(a) {
+    const d = xlDB.get();
+    if (!d.data[xlSel]) d.data[xlSel] = { v: '', f: '' };
+    d.data[xlSel].a = d.data[xlSel].a === a ? '' : a;
+    xlDB.set(d);
+    xlRender(); xlSelectHighlight();
+  }
+  function xlSetSize(sz) {
+    const d = xlDB.get();
+    if (!d.data[xlSel]) d.data[xlSel] = { v: '', f: '' };
+    d.data[xlSel].s = sz || '';
+    const c = d.data[xlSel];
+    if (!c.v && !c.f && !c.b && !c.i && !c.a && !c.s) delete d.data[xlSel];
+    xlDB.set(d);
+    xlRender(); xlSelectHighlight();
+  }
+
+  /* ─ 행/열 추가 ─ */
+  function xlAddRow() { const d=xlDB.get(); d.rows++; xlDB.set(d); xlRender(); }
+  function xlAddCol() { const d=xlDB.get(); d.cols++; xlDB.set(d); xlRender(); }
+
+  /* ─ 키보드 ─ */
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('view-excel').style.display === 'none') return;
+    const ref = parseRef(xlSel);
+    if (!ref) return;
+    const d = xlDB.get();
+
+    if (xlEditing) {
+      if (e.key === 'Enter') { e.preventDefault(); xlCommit(); const nr = colLetter(ref.ci)+(ref.row+1); xlSelect(nr); }
+      else if (e.key === 'Escape') { xlEditing = false; xlRender(); xlSelectHighlight(); }
+      else if (e.key === 'Tab') { e.preventDefault(); xlCommit(); const nc = colLetter(ref.ci+(e.shiftKey?-1:1))+ref.row; if(colIdx(nc.replace(/\d+/,''))>=0) xlSelect(nc); }
+      return;
+    }
+
+    const move = (ci, ri) => {
+      const nr = Math.max(1, ref.row + ri);
+      const nc = Math.max(0, ref.ci + ci);
+      xlSelect(colLetter(nc) + nr);
+    };
+    switch(e.key) {
+      case 'ArrowUp':    e.preventDefault(); move(0,-1); break;
+      case 'ArrowDown':  e.preventDefault(); move(0,1);  break;
+      case 'ArrowLeft':  e.preventDefault(); move(-1,0); break;
+      case 'ArrowRight': e.preventDefault(); move(1,0);  break;
+      case 'Tab':   e.preventDefault(); move(e.shiftKey?-1:1, 0); break;
+      case 'Enter': e.preventDefault(); xlStartEdit(xlSel); break;
+      case 'Delete': case 'Backspace':
+        e.preventDefault();
+        if (d.data[xlSel]) { d.data[xlSel].v=''; d.data[xlSel].f=''; const c=d.data[xlSel]; if(!c.b&&!c.i&&!c.a) delete d.data[xlSel]; xlDB.set(d); xlRender(); xlSelectHighlight(); }
+        break;
+      default:
+        if (e.key.length===1 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); xlStartEdit(xlSel, e.key); }
+    }
+
+    if ((e.ctrlKey||e.metaKey) && e.key==='b') { e.preventDefault(); xlFormat('b'); }
+    if ((e.ctrlKey||e.metaKey) && e.key==='i') { e.preventDefault(); xlFormat('i'); }
+  });
+
+  /* ─ 수식 바에서 Enter ─ */
+  document.getElementById('xl-formula').addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const val = e.target.value;
+    const d = xlDB.get();
+    if (!d.data[xlSel]) d.data[xlSel] = {};
+    if (val.startsWith('=')) { d.data[xlSel].f = val; d.data[xlSel].v = ''; }
+    else { d.data[xlSel].v = val; d.data[xlSel].f = ''; }
+    const c = d.data[xlSel];
+    if (!val && !c.b && !c.i && !c.a) delete d.data[xlSel];
+    xlDB.set(d);
+    xlRender(); xlSelectHighlight();
+  });
+
+  function openExcel() {
+    showView('view-excel');
+    xlRender();
+    xlSelectHighlight();
   }
 
   /* ─── 초기화 ─── */
