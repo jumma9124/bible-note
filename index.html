@@ -621,6 +621,8 @@
     <button class="xl-btn" onclick="xlAddRow()"  title="행 추가">+ 행</button>
     <button class="xl-btn" onclick="xlAddCol()"  title="열 추가">+ 열</button>
     <div class="xl-sep"></div>
+    <button class="xl-btn" id="xl-merge" onclick="xlMerge()" title="셀 병합 / 해제">병합</button>
+    <div class="xl-sep"></div>
     <div class="xl-color-wrap" title="셀 배경색">
       <button class="xl-btn xl-color-btn" onclick="document.getElementById('xl-bg-picker').click()" title="배경색 선택">
         <span class="color-swatch" id="xl-bg-swatch"></span>배경색
@@ -1110,7 +1112,7 @@
   const XL_DEFAULT_COLS = 15;
 
   function xlNewSheet(name) {
-    return { name, data: {}, rows: XL_DEFAULT_ROWS, cols: XL_DEFAULT_COLS, colW: {}, rowH: {} };
+    return { name, data: {}, rows: XL_DEFAULT_ROWS, cols: XL_DEFAULT_COLS, colW: {}, rowH: {}, merges: [] };
   }
 
   const xlDB = {
@@ -1118,7 +1120,8 @@
       let d = JSON.parse(localStorage.getItem(XL_KEY) || 'null');
       if (!d) return { sheets: [xlNewSheet('Sheet 1')], active: 0 };
       // 구버전 마이그레이션
-      if (!d.sheets) d = { sheets: [{ name: 'Sheet 1', data: d.data||{}, rows: d.rows||XL_DEFAULT_ROWS, cols: d.cols||XL_DEFAULT_COLS, colW: d.colW||{}, rowH: {} }], active: 0 };
+      if (!d.sheets) d = { sheets: [{ name: 'Sheet 1', data: d.data||{}, rows: d.rows||XL_DEFAULT_ROWS, cols: d.cols||XL_DEFAULT_COLS, colW: d.colW||{}, rowH: {}, merges: [] }], active: 0 };
+      d.sheets.forEach(s => { if (!s.merges) s.merges = []; });
       return d;
     },
     set: d => localStorage.setItem(XL_KEY, JSON.stringify(d)),
@@ -1159,6 +1162,19 @@
              cMin: Math.min(s.ci,e.ci), cMax: Math.max(s.ci,e.ci) };
   }
   function xlHasRange() { return xlRangeStart && xlRangeEnd && xlRangeStart !== xlRangeEnd; }
+
+  // 병합 헬퍼
+  function xlMergeAt(merges, r, c) { return merges.find(m => m.r1===r && m.c1===c); }
+  function xlMergeCovering(merges, r, c) { return merges.find(m => r>=m.r1 && r<=m.r2 && c>=m.c1 && c<=m.c2); }
+  function xlCoveredSet(merges) {
+    const s = new Set();
+    merges.forEach(m => {
+      for (let r=m.r1; r<=m.r2; r++)
+        for (let c=m.c1; c<=m.c2; c++)
+          if (r!==m.r1 || c!==m.c1) s.add(colLetter(c)+(r+1));
+    });
+    return s;
+  }
 
   function rangeCells(from, to) {
     const f = parseRef(from), t = parseRef(to);
@@ -1246,6 +1262,8 @@
     const db = xlDB.get();
     const sh = db.sheets[db.active];
     const { data, rows, cols, colW, rowH = {} } = sh;
+    const merges = sh.merges || [];
+    const covered = xlCoveredSet(merges);
     const sel = parseRef(xlSel);
     const wrap = document.getElementById('xl-grid');
     wrap.innerHTML = '';
@@ -1327,9 +1345,13 @@
 
       for (let c = 0; c < cols; c++) {
         const ref = colLetter(c) + (r + 1);
+        if (covered.has(ref)) continue; // 병합된 셀 건너뜀
         const cell = data[ref];
         const td = row.insertCell();
         td.dataset.ref = ref;
+        // 병합 colspan/rowspan
+        const mg = xlMergeAt(merges, r, c);
+        if (mg) { td.colSpan = mg.c2-mg.c1+1; td.rowSpan = mg.r2-mg.r1+1; }
         if (xlSelAll || xlSelCol === c) td.classList.add('sel-col-full');
         if (!xlSelAll && xlSelRow === r) td.classList.add('sel-row-full');
         if (sel && sel.ci === c && sel.ri === r) td.classList.add('sel');
@@ -1593,6 +1615,42 @@
     xlDB.set(db); xlRender(); xlSelectHighlight();
   }
 
+  /* ─ 병합 / 해제 ─ */
+  function xlMerge() {
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    if (!sh.merges) sh.merges = [];
+    const sel = parseRef(xlSel);
+    if (!sel) return;
+
+    // 이미 병합된 셀이면 해제
+    const existing = xlMergeAt(sh.merges, sel.ri, sel.ci);
+    if (existing) {
+      sh.merges = sh.merges.filter(m => m !== existing);
+      xlDB.set(db); xlRender(); xlSelectHighlight();
+      return;
+    }
+
+    // 범위가 없으면 무시
+    if (!xlHasRange()) return;
+    const b = xlRangeBounds();
+    if (!b) return;
+
+    // 겹치는 기존 병합 제거
+    sh.merges = sh.merges.filter(m =>
+      m.r2 < b.rMin || m.r1 > b.rMax || m.c2 < b.cMin || m.c1 > b.cMax
+    );
+
+    // 병합 영역 내 좌상단 제외 셀 데이터 삭제
+    for (let r = b.rMin; r <= b.rMax; r++)
+      for (let c = b.cMin; c <= b.cMax; c++)
+        if (r !== b.rMin || c !== b.cMin) delete sh.data[colLetter(c) + (r + 1)];
+
+    sh.merges.push({ r1: b.rMin, c1: b.cMin, r2: b.rMax, c2: b.cMax });
+    xlRangeStart = null; xlRangeEnd = null;
+    xlSel = colLetter(b.cMin) + (b.rMin + 1);
+    xlDB.set(db); xlRender(); xlSelectHighlight();
+  }
+
   /* ─ 편집 시작 ─ */
   function xlStartEdit(ref, prefill) {
     xlSel = ref.toUpperCase();
@@ -1650,6 +1708,8 @@
     if (sw) sw.style.background = (cell&&cell.bg) ? cell.bg : '';
     const tsw = document.getElementById('xl-tc-swatch');
     if (tsw) tsw.style.background = (cell&&cell.tc) ? cell.tc : '#e74c3c';
+    const mBtn = document.getElementById('xl-merge');
+    if (mBtn) { const s=parseRef(xlSel); const {sh:sh2}=xlDB.sh(); mBtn.classList.toggle('active', !!(s&&xlMergeAt(sh2.merges||[],s.ri,s.ci))); }
   }
 
   /* ─ 서식 ─ */
