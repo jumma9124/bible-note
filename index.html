@@ -1376,7 +1376,7 @@
       }
 
       tab.onclick = () => xlSwitchSheet(idx);
-      tab.ondblclick = (e) => { e.stopPropagation(); xlRenameSheet(idx); };
+      tab.ondblclick = (e) => { e.stopPropagation(); e.preventDefault(); xlRenameSheet(idx); };
       bar.appendChild(tab);
     });
 
@@ -1432,18 +1432,24 @@
     const tabEls = bar.querySelectorAll('.sheet-tab');
     const tabEl = tabEls[idx];
     if (!tabEl) return;
+    // 이미 편집 중이면 중복 실행 방지
+    if (tabEl.querySelector('input.tab-name-input')) return;
     const nameSpan = tabEl.querySelector('span');
-    if (!nameSpan || nameSpan.tagName === 'INPUT') return;
+    if (!nameSpan) return;
 
     const db = xlDB.get();
     const inp = document.createElement('input');
     inp.className = 'tab-name-input';
     inp.value = db.sheets[idx].name;
     nameSpan.replaceWith(inp);
-    inp.focus();
-    inp.select();
 
+    // DOM 업데이트 후 포커스 (즉시 blur 방지)
+    setTimeout(() => { inp.focus(); inp.select(); }, 0);
+
+    let saved = false;
     const save = () => {
+      if (saved) return;
+      saved = true;
       const db2 = xlDB.get();
       const newName = inp.value.trim();
       if (newName) db2.sheets[idx].name = newName;
@@ -1452,8 +1458,8 @@
     };
     inp.addEventListener('blur', save);
     inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
-      if (e.key === 'Escape') { xlRenderTabs(); }
+      if (e.key === 'Enter') { e.preventDefault(); save(); }
+      if (e.key === 'Escape') { saved = true; xlRenderTabs(); }
     });
   }
 
@@ -1655,6 +1661,8 @@
   /* ─ 키보드 ─ */
   document.addEventListener('keydown', e => {
     if (document.getElementById('view-excel').style.display === 'none') return;
+    // 탭 이름 편집 중이면 키 이벤트 무시
+    if (document.activeElement && document.activeElement.classList.contains('tab-name-input')) return;
     const ref = parseRef(xlSel);
     if (!ref) return;
 
