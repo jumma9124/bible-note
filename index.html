@@ -410,9 +410,20 @@
       user-select: none;
       white-space: nowrap;
     }
-    .sheet-tbl th.th-corner { position: sticky; top: 0; left: 0; z-index: 4; width: 42px; min-width: 42px; }
-    .sheet-tbl th.th-col   { position: sticky; top: 0; z-index: 3; }
+    .sheet-tbl th.th-corner { position: sticky; top: 0; left: 0; z-index: 4; width: 42px; min-width: 42px; cursor: pointer; }
+    .sheet-tbl th.th-corner.sel-all { background: #2a4898; color: #fff; }
+    .sheet-tbl th.th-corner:hover { background: #e0e6f8; }
+    .sheet-tbl th.th-col   { position: sticky; top: 0; z-index: 3; cursor: pointer; }
     .sheet-tbl th.th-col.sel-col { background: #c8d8f8; color: #1a3570; }
+    .sheet-tbl th.th-col.sel-col-full { background: #2a4898; color: #fff; }
+    .col-resizer { position: absolute; right: 0; top: 0; width: 5px; height: 100%; cursor: col-resize; z-index: 10; background: transparent; }
+    .col-resizer:hover { background: rgba(42,72,152,0.35); }
+    .row-resizer { position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; cursor: row-resize; z-index: 10; background: transparent; }
+    .row-resizer:hover { background: rgba(42,72,152,0.35); }
+    .sheet-tbl td.td-rh { cursor: pointer; position: relative; }
+    .sheet-tbl td.td-rh.sel-row-full { background: #2a4898; color: #fff; font-weight: 600; }
+    .sheet-tbl td.sel-col-full { background: #c8d8f8; }
+    .sheet-tbl td.sel-row-full { background: #c8d8f8; }
 
     .sheet-tbl td {
       border: 1px solid #e4e8f5;
@@ -450,7 +461,6 @@
       font-size: 13px;
       white-space: nowrap;
       overflow: hidden;
-      height: 100%;
       line-height: 20px;
     }
     .cell-edit-input {
@@ -492,6 +502,50 @@
       border-color: #dde3f0;
       color: #2a4898;
       font-weight: 600;
+    }
+    .sheet-tab { display: flex; align-items: center; gap: 3px; }
+    .tab-del {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 5px;
+      width: 14px;
+      height: 14px;
+      font-size: 12px;
+      color: #aaa;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+      line-height: 1;
+      border-radius: 3px;
+      vertical-align: middle;
+    }
+    .tab-del:hover { background: #f0c0c0; color: #e74c3c; }
+    .tab-add {
+      padding: 3px 10px;
+      font-size: 14px;
+      color: #888;
+      cursor: pointer;
+      background: none;
+      border: none;
+      border-radius: 4px;
+    }
+    .tab-add:hover { background: #dde3f0; color: #2a4898; }
+    .xl-color-wrap { display: inline-flex; align-items: center; gap: 2px; }
+    .xl-color-btn { display: inline-flex; align-items: center; gap: 4px; }
+    .color-swatch { display: inline-block; width: 18px; height: 10px; border: 1px solid #aaa; border-radius: 2px; }
+    .xl-clear-color { font-size: 10px; padding: 2px 4px; color: #888; }
+    input[type="color"].xl-hidden-picker { width: 0; height: 0; padding: 0; border: none; visibility: hidden; position: absolute; }
+    .tab-name-input {
+      width: 70px;
+      font-family: inherit;
+      font-size: 12px;
+      border: 1px solid #2a4898;
+      border-radius: 3px;
+      outline: none;
+      padding: 1px 4px;
+      background: #fff;
     }
   </style>
 </head>
@@ -564,6 +618,21 @@
     <button class="xl-btn" onclick="xlAddRow()"  title="행 추가">+ 행</button>
     <button class="xl-btn" onclick="xlAddCol()"  title="열 추가">+ 열</button>
     <div class="xl-sep"></div>
+    <div class="xl-color-wrap" title="셀 배경색">
+      <button class="xl-btn xl-color-btn" onclick="document.getElementById('xl-bg-picker').click()" title="배경색 선택">
+        <span class="color-swatch" id="xl-bg-swatch"></span>배경색
+      </button>
+      <input type="color" class="xl-hidden-picker" id="xl-bg-picker" value="#ffff88" onchange="xlSetBg(this.value)">
+      <button class="xl-btn xl-clear-color" onclick="xlSetBg('')" title="배경색 제거">✕</button>
+    </div>
+    <div class="xl-color-wrap" title="글씨 색">
+      <button class="xl-btn xl-color-btn" onclick="document.getElementById('xl-tc-picker').click()" title="글씨 색 선택">
+        <span class="color-swatch" id="xl-tc-swatch" style="background:#e74c3c"></span>글씨색
+      </button>
+      <input type="color" class="xl-hidden-picker" id="xl-tc-picker" value="#e74c3c" onchange="xlSetTc(this.value)">
+      <button class="xl-btn xl-clear-color" onclick="xlSetTc('')" title="글씨 색 제거">✕</button>
+    </div>
+    <div class="xl-sep"></div>
     <div class="formula-bar">
       <div class="cell-addr" id="xl-addr">A1</div>
       <div class="fx-label">fx</div>
@@ -573,9 +642,7 @@
   <div class="sheet-body">
     <div class="grid-wrap" id="xl-grid"></div>
   </div>
-  <div class="sheet-footer">
-    <div class="sheet-tab active">Sheet 1</div>
-  </div>
+  <div class="sheet-footer" id="xl-tabs"></div>
 </div>
 
 <!-- ───── 성경필사 ───── -->
@@ -1039,14 +1106,27 @@
   const XL_DEFAULT_ROWS = 50;
   const XL_DEFAULT_COLS = 15;
 
+  function xlNewSheet(name) {
+    return { name, data: {}, rows: XL_DEFAULT_ROWS, cols: XL_DEFAULT_COLS, colW: {}, rowH: {} };
+  }
+
   const xlDB = {
-    get: () => JSON.parse(localStorage.getItem(XL_KEY) || 'null')
-            || { data: {}, rows: XL_DEFAULT_ROWS, cols: XL_DEFAULT_COLS, colW: {} },
-    set: d => localStorage.setItem(XL_KEY, JSON.stringify(d))
+    get: () => {
+      let d = JSON.parse(localStorage.getItem(XL_KEY) || 'null');
+      if (!d) return { sheets: [xlNewSheet('Sheet 1')], active: 0 };
+      // 구버전 마이그레이션
+      if (!d.sheets) d = { sheets: [{ name: 'Sheet 1', data: d.data||{}, rows: d.rows||XL_DEFAULT_ROWS, cols: d.cols||XL_DEFAULT_COLS, colW: d.colW||{}, rowH: {} }], active: 0 };
+      return d;
+    },
+    set: d => localStorage.setItem(XL_KEY, JSON.stringify(d)),
+    sh:  function() { const d = this.get(); return { db: d, sh: d.sheets[d.active] }; }
   };
 
   let xlSel = 'A1';
   let xlEditing = false;
+  let xlSelCol = null;
+  let xlSelRow = null;
+  let xlSelAll = false;
 
   /* ─ 열 이름 변환 ─ */
   function colLetter(n) { // n: 0-indexed → 'A','B',...
@@ -1147,8 +1227,9 @@
 
   /* ─ 렌더링 ─ */
   function xlRender() {
-    const d = xlDB.get();
-    const { data, rows, cols } = d;
+    const db = xlDB.get();
+    const sh = db.sheets[db.active];
+    const { data, rows, cols, colW, rowH = {} } = sh;
     const sel = parseRef(xlSel);
     const wrap = document.getElementById('xl-grid');
     wrap.innerHTML = '';
@@ -1156,34 +1237,85 @@
     const tbl = document.createElement('table');
     tbl.className = 'sheet-tbl';
 
-    // Header row
     const thead = tbl.createTHead();
     const hr = thead.insertRow();
     const corner = document.createElement('th');
-    corner.className = 'th-corner';
+    corner.className = 'th-corner' + (xlSelAll ? ' sel-all' : '');
+    corner.title = '전체 선택';
+    corner.addEventListener('click', () => { if (xlEditing) xlCommit(); xlSelectAll(); });
     hr.appendChild(corner);
     for (let c = 0; c < cols; c++) {
       const th = document.createElement('th');
-      th.className = 'th-col' + (sel && sel.ci === c ? ' sel-col' : '');
+      th.className = 'th-col' + ((xlSelAll || xlSelCol === c) ? ' sel-col-full' : (xlSelCol === null && !xlSelAll && sel && sel.ci === c ? ' sel-col' : ''));
       th.textContent = colLetter(c);
-      const w = d.colW[colLetter(c)] || 100;
+      const w = colW[colLetter(c)] || 100;
       th.style.width = th.style.minWidth = w + 'px';
+      th.addEventListener('click', ((ci) => () => { if (xlEditing) xlCommit(); xlSelectCol(ci); })(c));
+      const colResizer = document.createElement('div');
+      colResizer.className = 'col-resizer';
+      colResizer.addEventListener('click', e => e.stopPropagation());
+      colResizer.addEventListener('mousedown', ((th_, letter_) => e => {
+        e.stopPropagation(); e.preventDefault();
+        const startX = e.clientX, startW = colW[letter_] || 100;
+        const onMove = e2 => { th_.style.width = th_.style.minWidth = Math.max(30, startW + e2.clientX - startX) + 'px'; };
+        const onUp = e2 => {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          const db2 = xlDB.get();
+          db2.sheets[db2.active].colW[letter_] = Math.max(30, startW + e2.clientX - startX);
+          xlDB.set(db2); xlRender();
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      })(th, colLetter(c)));
+      th.appendChild(colResizer);
       hr.appendChild(th);
     }
 
-    // Body
     const tbody = tbl.createTBody();
     for (let r = 0; r < rows; r++) {
       const row = tbody.insertRow();
+      // 행 높이: 해당 행의 최대 글씨 크기 기준 자동계산, 또는 사용자가 드래그로 지정한 값
+      let maxFontSz = 0;
+      for (let c2 = 0; c2 < cols; c2++) {
+        const c2ell = data[colLetter(c2) + (r + 1)];
+        if (c2ell && c2ell.s) maxFontSz = Math.max(maxFontSz, parseInt(c2ell.s) || 0);
+      }
+      const autoH = maxFontSz ? Math.max(24, maxFontSz + 10) : 24;
+      row.style.height = (rowH[r + 1] || autoH) + 'px';
+
       const rh = row.insertCell();
-      rh.className = 'td-rh' + (sel && sel.ri === r ? ' sel-row' : '');
+      rh.className = 'td-rh' + ((xlSelAll || xlSelRow === r) ? ' sel-row-full' : (xlSelRow === null && !xlSelAll && sel && sel.ri === r ? ' sel-row' : ''));
       rh.textContent = r + 1;
+      rh.addEventListener('click', ((ri) => () => { if (xlEditing) xlCommit(); xlSelectRow(ri); })(r));
+      const rowResizer = document.createElement('div');
+      rowResizer.className = 'row-resizer';
+      rowResizer.addEventListener('click', e => e.stopPropagation());
+      rowResizer.addEventListener('mousedown', ((row_, ri_) => e => {
+        e.stopPropagation(); e.preventDefault();
+        const startY = e.clientY, startH = rowH[ri_ + 1] || autoH;
+        const onMove = e2 => { row_.style.height = Math.max(16, startH + e2.clientY - startY) + 'px'; };
+        const onUp = e2 => {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          const newH = Math.max(16, startH + e2.clientY - startY);
+          const db2 = xlDB.get();
+          if (!db2.sheets[db2.active].rowH) db2.sheets[db2.active].rowH = {};
+          db2.sheets[db2.active].rowH[ri_ + 1] = newH;
+          xlDB.set(db2); xlRender();
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      })(row, r));
+      rh.appendChild(rowResizer);
 
       for (let c = 0; c < cols; c++) {
         const ref = colLetter(c) + (r + 1);
         const cell = data[ref];
         const td = row.insertCell();
         td.dataset.ref = ref;
+        if (xlSelAll || xlSelCol === c) td.classList.add('sel-col-full');
+        if (!xlSelAll && xlSelRow === r) td.classList.add('sel-row-full');
         if (sel && sel.ci === c && sel.ri === r) td.classList.add('sel');
 
         const span = document.createElement('span');
@@ -1191,13 +1323,15 @@
         const dv = xlDisplay(ref, data);
         span.textContent = dv !== null && dv !== undefined ? dv : '';
         if (cell) {
+          if (cell.bg) td.style.backgroundColor = cell.bg;
+          if (cell.tc) span.style.color = cell.tc;
           if (cell.b) span.style.fontWeight = 'bold';
           if (cell.i) span.style.fontStyle = 'italic';
-          if (cell.a) span.style.textAlign = cell.a;
-          else if (typeof dv === 'number') span.style.textAlign = 'right';
-          if (cell.s) { span.style.fontSize = cell.s + 'px'; td.style.height = Math.max(24, parseInt(cell.s) + 8) + 'px'; }
+          if (cell.a) { td.style.textAlign = cell.a; span.style.textAlign = cell.a; }
+          else if (typeof dv === 'number') { td.style.textAlign = 'right'; span.style.textAlign = 'right'; }
+          if (cell.s) span.style.fontSize = cell.s + 'px';
         } else if (typeof dv === 'number') {
-          span.style.textAlign = 'right';
+          td.style.textAlign = 'right'; span.style.textAlign = 'right';
         }
 
         td.appendChild(span);
@@ -1209,6 +1343,7 @@
     tbl.appendChild(tbody);
     wrap.appendChild(tbl);
     xlScrollToSel();
+    xlRenderTabs();
   }
 
   function xlScrollToSel() {
@@ -1216,18 +1351,154 @@
     if (td) td.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
+  /* ─ 탭 렌더링 ─ */
+  function xlRenderTabs() {
+    const db = xlDB.get();
+    const bar = document.getElementById('xl-tabs');
+    bar.innerHTML = '';
+
+    db.sheets.forEach((sheet, idx) => {
+      const tab = document.createElement('div');
+      tab.className = 'sheet-tab' + (idx === db.active ? ' active' : '');
+
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = sheet.name;
+      tab.appendChild(nameSpan);
+
+      // 삭제 버튼 (탭이 2개 이상일 때만)
+      if (db.sheets.length > 1) {
+        const del = document.createElement('button');
+        del.className = 'tab-del';
+        del.textContent = '×';
+        del.title = '탭 삭제';
+        del.onclick = (e) => { e.stopPropagation(); xlDeleteSheet(idx); };
+        tab.appendChild(del);
+      }
+
+      tab.onclick = () => xlSwitchSheet(idx);
+      tab.ondblclick = (e) => { e.stopPropagation(); xlRenameSheet(idx); };
+      bar.appendChild(tab);
+    });
+
+    // + 버튼
+    const addBtn = document.createElement('button');
+    addBtn.className = 'tab-add';
+    addBtn.textContent = '+';
+    addBtn.title = '새 탭 추가';
+    addBtn.onclick = xlAddSheet;
+    bar.appendChild(addBtn);
+  }
+
+  /* ─ 탭 전환 ─ */
+  function xlSwitchSheet(idx) {
+    if (xlEditing) xlCommit();
+    const db = xlDB.get();
+    if (db.active === idx) return; // 이미 해당 탭이면 DOM 재구성 스킵 (dblclick rename 보호)
+    db.active = idx;
+    xlDB.set(db);
+    xlSel = 'A1'; xlSelCol = null; xlSelRow = null; xlSelAll = false;
+    xlRender();
+    xlSelectHighlight();
+  }
+
+  /* ─ 탭 추가 ─ */
+  function xlAddSheet() {
+    const db = xlDB.get();
+    const num = db.sheets.length + 1;
+    db.sheets.push(xlNewSheet('Sheet ' + num));
+    db.active = db.sheets.length - 1;
+    xlDB.set(db);
+    xlSel = 'A1';
+    xlRender();
+    xlSelectHighlight();
+  }
+
+  /* ─ 탭 삭제 ─ */
+  function xlDeleteSheet(idx) {
+    const db = xlDB.get();
+    if (db.sheets.length === 1) return;
+    if (!confirm(`"${db.sheets[idx].name}" 탭을 삭제할까요?`)) return;
+    db.sheets.splice(idx, 1);
+    db.active = Math.min(db.active, db.sheets.length - 1);
+    xlDB.set(db);
+    xlSel = 'A1';
+    xlRender();
+    xlSelectHighlight();
+  }
+
+  /* ─ 탭 이름 변경 ─ */
+  function xlRenameSheet(idx) {
+    const bar = document.getElementById('xl-tabs');
+    const tabEls = bar.querySelectorAll('.sheet-tab');
+    const tabEl = tabEls[idx];
+    if (!tabEl) return;
+    const nameSpan = tabEl.querySelector('span');
+    if (!nameSpan || nameSpan.tagName === 'INPUT') return;
+
+    const db = xlDB.get();
+    const inp = document.createElement('input');
+    inp.className = 'tab-name-input';
+    inp.value = db.sheets[idx].name;
+    nameSpan.replaceWith(inp);
+    inp.focus();
+    inp.select();
+
+    const save = () => {
+      const db2 = xlDB.get();
+      const newName = inp.value.trim();
+      if (newName) db2.sheets[idx].name = newName;
+      xlDB.set(db2);
+      xlRenderTabs();
+    };
+    inp.addEventListener('blur', save);
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+      if (e.key === 'Escape') { xlRenderTabs(); }
+    });
+  }
+
   /* ─ 셀 선택 ─ */
   function xlSelect(ref) {
     xlEditing = false;
+    xlSelCol = null;
+    xlSelRow = null;
+    xlSelAll = false;
     xlSel = ref.toUpperCase();
-    const d = xlDB.get();
-    const cell = d.data[xlSel];
-    document.getElementById('xl-addr').textContent = xlSel;
-    document.getElementById('xl-formula').value = cell ? (cell.f || (cell.v ?? '')) : '';
-    document.getElementById('xl-bold').classList.toggle('active', !!(cell&&cell.b));
-    document.getElementById('xl-italic').classList.toggle('active', !!(cell&&cell.i));
-    // Re-render to update selection highlight
     xlRender();
+    xlSelectHighlight();
+  }
+
+  /* ─ 컬럼 전체 선택 ─ */
+  function xlSelectCol(c) {
+    xlSelCol = c;
+    xlSelRow = null;
+    xlSelAll = false;
+    xlEditing = false;
+    xlSel = colLetter(c) + '1';
+    xlRender();
+    xlSelectHighlight();
+  }
+
+  /* ─ 행 전체 선택 ─ */
+  function xlSelectRow(r) {
+    xlSelRow = r;
+    xlSelCol = null;
+    xlSelAll = false;
+    xlEditing = false;
+    xlSel = 'A' + (r + 1);
+    xlRender();
+    xlSelectHighlight();
+  }
+
+  /* ─ 전체 선택 ─ */
+  function xlSelectAll() {
+    xlSelAll = true;
+    xlSelCol = null;
+    xlSelRow = null;
+    xlEditing = false;
+    xlSel = 'A1';
+    xlRender();
+    xlSelectHighlight();
   }
 
   /* ─ 편집 시작 ─ */
@@ -1241,8 +1512,8 @@
     const inp = document.createElement('input');
     inp.className = 'cell-edit-input';
     inp.id = 'xl-cell-inp';
-    const d = xlDB.get();
-    const cell = d.data[xlSel];
+    const { sh } = xlDB.sh();
+    const cell = sh.data[xlSel];
     inp.value = prefill !== undefined ? prefill : (cell ? (cell.f || (cell.v ?? '')) : '');
     td.appendChild(inp);
     inp.focus();
@@ -1250,10 +1521,7 @@
 
     document.getElementById('xl-addr').textContent = xlSel;
     document.getElementById('xl-formula').value = inp.value;
-
-    inp.addEventListener('input', () => {
-      document.getElementById('xl-formula').value = inp.value;
-    });
+    inp.addEventListener('input', () => { document.getElementById('xl-formula').value = inp.value; });
     inp.addEventListener('blur', () => { if (xlEditing) xlCommit(); });
   }
 
@@ -1263,21 +1531,21 @@
     const inp = document.getElementById('xl-cell-inp');
     if (!inp) return;
     const val = inp.value;
-    const d = xlDB.get();
-    if (!d.data[xlSel]) d.data[xlSel] = {};
-    if (val.startsWith('=')) { d.data[xlSel].f = val; d.data[xlSel].v = ''; }
-    else { d.data[xlSel].v = val; d.data[xlSel].f = ''; }
-    // Clean up empty cells with no formatting
-    const c = d.data[xlSel];
-    if (!val && !c.b && !c.i && !c.a) delete d.data[xlSel];
-    xlDB.set(d);
+    const db = xlDB.get();
+    const sh = db.sheets[db.active];
+    if (!sh.data[xlSel]) sh.data[xlSel] = {};
+    if (val.startsWith('=')) { sh.data[xlSel].f = val; sh.data[xlSel].v = ''; }
+    else { sh.data[xlSel].v = val; sh.data[xlSel].f = ''; }
+    const c = sh.data[xlSel];
+    if (!val && !c.b && !c.i && !c.a && !c.s) delete sh.data[xlSel];
+    xlDB.set(db);
     xlRender();
     xlSelectHighlight();
   }
 
   function xlSelectHighlight() {
-    const d = xlDB.get();
-    const cell = d.data[xlSel];
+    const { sh } = xlDB.sh();
+    const cell = sh.data[xlSel];
     document.getElementById('xl-addr').textContent = xlSel;
     document.getElementById('xl-formula').value = cell ? (cell.f || (cell.v ?? '')) : '';
     document.getElementById('xl-bold').classList.toggle('active',   !!(cell&&cell.b));
@@ -1286,56 +1554,118 @@
     document.getElementById('xl-center').classList.toggle('active', !!(cell&&cell.a==='center'));
     document.getElementById('xl-right').classList.toggle('active',  !!(cell&&cell.a==='right'));
     document.getElementById('xl-size').value = (cell&&cell.s) ? cell.s : '';
+    const sw = document.getElementById('xl-bg-swatch');
+    if (sw) sw.style.background = (cell&&cell.bg) ? cell.bg : '';
+    const tsw = document.getElementById('xl-tc-swatch');
+    if (tsw) tsw.style.background = (cell&&cell.tc) ? cell.tc : '#e74c3c';
   }
 
   /* ─ 서식 ─ */
+  function xlCleanCell(sh, ref) {
+    const c = sh.data[ref];
+    if (c && !c.v && !c.f && !c.b && !c.i && !c.a && !c.s && !c.bg && !c.tc) delete sh.data[ref];
+  }
+
+  function xlGetSelRefs(sh) {
+    if (xlSelAll) {
+      const refs = [];
+      for (let r = 0; r < sh.rows; r++)
+        for (let c = 0; c < sh.cols; c++)
+          refs.push(colLetter(c) + (r + 1));
+      return refs;
+    }
+    if (xlSelCol !== null)
+      return Array.from({length: sh.rows}, (_, r) => colLetter(xlSelCol) + (r + 1));
+    if (xlSelRow !== null)
+      return Array.from({length: sh.cols}, (_, c) => colLetter(c) + (xlSelRow + 1));
+    return [xlSel];
+  }
+
   function xlFormat(prop) {
-    const d = xlDB.get();
-    if (!d.data[xlSel]) d.data[xlSel] = { v: '', f: '' };
-    d.data[xlSel][prop] = !d.data[xlSel][prop];
-    xlDB.set(d);
-    xlRender(); xlSelectHighlight();
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    const refs = xlGetSelRefs(sh);
+    const newVal = !(sh.data[xlSel] && sh.data[xlSel][prop]);
+    refs.forEach(ref => {
+      if (!sh.data[ref]) sh.data[ref] = { v: '', f: '' };
+      if (newVal) sh.data[ref][prop] = true;
+      else delete sh.data[ref][prop];
+      xlCleanCell(sh, ref);
+    });
+    xlDB.set(db); xlRender(); xlSelectHighlight();
   }
   function xlAlign(a) {
-    const d = xlDB.get();
-    if (!d.data[xlSel]) d.data[xlSel] = { v: '', f: '' };
-    d.data[xlSel].a = d.data[xlSel].a === a ? '' : a;
-    xlDB.set(d);
-    xlRender(); xlSelectHighlight();
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    const refs = xlGetSelRefs(sh);
+    const curA = sh.data[xlSel] ? sh.data[xlSel].a : '';
+    const newA = (curA === a) ? '' : a;
+    refs.forEach(ref => {
+      if (!sh.data[ref]) sh.data[ref] = { v: '', f: '' };
+      sh.data[ref].a = newA;
+      xlCleanCell(sh, ref);
+    });
+    xlDB.set(db); xlRender(); xlSelectHighlight();
   }
+  function xlSetBg(color) {
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    const refs = xlGetSelRefs(sh);
+    refs.forEach(ref => {
+      if (!sh.data[ref]) sh.data[ref] = { v: '', f: '' };
+      if (color) sh.data[ref].bg = color;
+      else delete sh.data[ref].bg;
+      xlCleanCell(sh, ref);
+    });
+    if (color) {
+      const sw = document.getElementById('xl-bg-swatch');
+      if (sw) sw.style.background = color;
+    }
+    xlDB.set(db); xlRender(); xlSelectHighlight();
+  }
+
+  function xlSetTc(color) {
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    const refs = xlGetSelRefs(sh);
+    refs.forEach(ref => {
+      if (!sh.data[ref]) sh.data[ref] = { v: '', f: '' };
+      if (color) sh.data[ref].tc = color;
+      else delete sh.data[ref].tc;
+      xlCleanCell(sh, ref);
+    });
+    if (color) {
+      const sw = document.getElementById('xl-tc-swatch');
+      if (sw) sw.style.background = color;
+    }
+    xlDB.set(db); xlRender(); xlSelectHighlight();
+  }
+
   function xlSetSize(sz) {
-    const d = xlDB.get();
-    if (!d.data[xlSel]) d.data[xlSel] = { v: '', f: '' };
-    d.data[xlSel].s = sz || '';
-    const c = d.data[xlSel];
-    if (!c.v && !c.f && !c.b && !c.i && !c.a && !c.s) delete d.data[xlSel];
-    xlDB.set(d);
-    xlRender(); xlSelectHighlight();
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    const refs = xlGetSelRefs(sh);
+    refs.forEach(ref => {
+      if (!sh.data[ref]) sh.data[ref] = { v: '', f: '' };
+      sh.data[ref].s = sz || '';
+      xlCleanCell(sh, ref);
+    });
+    xlDB.set(db); xlRender(); xlSelectHighlight();
   }
 
   /* ─ 행/열 추가 ─ */
-  function xlAddRow() { const d=xlDB.get(); d.rows++; xlDB.set(d); xlRender(); }
-  function xlAddCol() { const d=xlDB.get(); d.cols++; xlDB.set(d); xlRender(); }
+  function xlAddRow() { const db=xlDB.get(); db.sheets[db.active].rows++; xlDB.set(db); xlRender(); }
+  function xlAddCol() { const db=xlDB.get(); db.sheets[db.active].cols++; xlDB.set(db); xlRender(); }
 
   /* ─ 키보드 ─ */
   document.addEventListener('keydown', e => {
     if (document.getElementById('view-excel').style.display === 'none') return;
     const ref = parseRef(xlSel);
     if (!ref) return;
-    const d = xlDB.get();
 
     if (xlEditing) {
-      if (e.key === 'Enter') { e.preventDefault(); xlCommit(); const nr = colLetter(ref.ci)+(ref.row+1); xlSelect(nr); }
+      if (e.key === 'Enter') { e.preventDefault(); xlCommit(); xlSelect(colLetter(ref.ci)+(ref.row+1)); }
       else if (e.key === 'Escape') { xlEditing = false; xlRender(); xlSelectHighlight(); }
-      else if (e.key === 'Tab') { e.preventDefault(); xlCommit(); const nc = colLetter(ref.ci+(e.shiftKey?-1:1))+ref.row; if(colIdx(nc.replace(/\d+/,''))>=0) xlSelect(nc); }
+      else if (e.key === 'Tab') { e.preventDefault(); xlCommit(); const nc=Math.max(0,ref.ci+(e.shiftKey?-1:1)); xlSelect(colLetter(nc)+ref.row); }
       return;
     }
 
-    const move = (ci, ri) => {
-      const nr = Math.max(1, ref.row + ri);
-      const nc = Math.max(0, ref.ci + ci);
-      xlSelect(colLetter(nc) + nr);
-    };
+    const move = (ci, ri) => xlSelect(colLetter(Math.max(0,ref.ci+ci)) + Math.max(1,ref.row+ri));
     switch(e.key) {
       case 'ArrowUp':    e.preventDefault(); move(0,-1); break;
       case 'ArrowDown':  e.preventDefault(); move(0,1);  break;
@@ -1345,33 +1675,33 @@
       case 'Enter': e.preventDefault(); xlStartEdit(xlSel); break;
       case 'Delete': case 'Backspace':
         e.preventDefault();
-        if (d.data[xlSel]) { d.data[xlSel].v=''; d.data[xlSel].f=''; const c=d.data[xlSel]; if(!c.b&&!c.i&&!c.a) delete d.data[xlSel]; xlDB.set(d); xlRender(); xlSelectHighlight(); }
+        const db=xlDB.get(); const sh=db.sheets[db.active];
+        if (sh.data[xlSel]) { sh.data[xlSel].v=''; sh.data[xlSel].f=''; const c=sh.data[xlSel]; if(!c.b&&!c.i&&!c.a&&!c.s) delete sh.data[xlSel]; xlDB.set(db); xlRender(); xlSelectHighlight(); }
         break;
       default:
         if (e.key.length===1 && !e.ctrlKey && !e.metaKey) { e.preventDefault(); xlStartEdit(xlSel, e.key); }
     }
-
     if ((e.ctrlKey||e.metaKey) && e.key==='b') { e.preventDefault(); xlFormat('b'); }
     if ((e.ctrlKey||e.metaKey) && e.key==='i') { e.preventDefault(); xlFormat('i'); }
   });
 
-  /* ─ 수식 바에서 Enter ─ */
+  /* ─ 수식 바 Enter ─ */
   document.getElementById('xl-formula').addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
     const val = e.target.value;
-    const d = xlDB.get();
-    if (!d.data[xlSel]) d.data[xlSel] = {};
-    if (val.startsWith('=')) { d.data[xlSel].f = val; d.data[xlSel].v = ''; }
-    else { d.data[xlSel].v = val; d.data[xlSel].f = ''; }
-    const c = d.data[xlSel];
-    if (!val && !c.b && !c.i && !c.a) delete d.data[xlSel];
-    xlDB.set(d);
-    xlRender(); xlSelectHighlight();
+    const db = xlDB.get(); const sh = db.sheets[db.active];
+    if (!sh.data[xlSel]) sh.data[xlSel] = {};
+    if (val.startsWith('=')) { sh.data[xlSel].f = val; sh.data[xlSel].v = ''; }
+    else { sh.data[xlSel].v = val; sh.data[xlSel].f = ''; }
+    const c = sh.data[xlSel];
+    if (!val && !c.b && !c.i && !c.a && !c.s) delete sh.data[xlSel];
+    xlDB.set(db); xlRender(); xlSelectHighlight();
   });
 
   function openExcel() {
     showView('view-excel');
+    xlSel = 'A1';
     xlRender();
     xlSelectHighlight();
   }
