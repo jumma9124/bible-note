@@ -1399,10 +1399,20 @@
           else if (typeof dv === 'number') { td.style.textAlign = 'right'; span.style.textAlign = 'right'; }
           if (cell.s) span.style.fontSize = cell.s + 'px';
           if (cell.bd) {
-            if (cell.bd.t) td.style.borderTop    = cell.bd.t;
-            if (cell.bd.b) td.style.borderBottom = cell.bd.b;
-            if (cell.bd.l) td.style.borderLeft   = cell.bd.l;
-            if (cell.bd.r) td.style.borderRight  = cell.bd.r;
+            const toShadow = (val, x, y) => {
+              if (!val) return null;
+              const thick = val.startsWith('2');
+              const w = thick ? 2 : 1;
+              const col = thick ? '#111' : '#555';
+              return `inset ${x*w}px ${y*w}px 0 0 ${col}`;
+            };
+            const shadows = [
+              toShadow(cell.bd.t,  0,  1),
+              toShadow(cell.bd.b,  0, -1),
+              toShadow(cell.bd.l,  1,  0),
+              toShadow(cell.bd.r, -1,  0),
+            ].filter(Boolean);
+            if (shadows.length) td.style.boxShadow = shadows.join(', ');
           }
         } else if (typeof dv === 'number') {
           td.style.textAlign = 'right'; span.style.textAlign = 'right';
