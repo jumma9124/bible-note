@@ -1768,6 +1768,21 @@
     document.getElementById('xl-formula').value = inp.value;
     inp.addEventListener('input', () => { document.getElementById('xl-formula').value = inp.value; });
     inp.addEventListener('blur', () => { if (xlEditing) xlCommit(); });
+    inp.addEventListener('keydown', e => {
+      const r = parseRef(xlSel); if (!r) return;
+      if (e.key === 'Tab') {
+        e.preventDefault(); e.stopPropagation();
+        xlCommit();
+        xlSelect(colLetter(Math.max(0, r.ci + (e.shiftKey ? -1 : 1))) + r.row);
+      } else if (e.key === 'Enter') {
+        e.preventDefault(); e.stopPropagation();
+        xlCommit();
+        xlSelect(colLetter(r.ci) + (r.row + 1));
+      } else if (e.key === 'Escape') {
+        e.preventDefault(); e.stopPropagation();
+        xlEditing = false; xlRender(); xlSelectHighlight();
+      }
+    });
   }
 
   /* ─ 저장 ─ */
@@ -1914,12 +1929,7 @@
     const ref = parseRef(xlSel);
     if (!ref) return;
 
-    if (xlEditing) {
-      if (e.key === 'Enter') { e.preventDefault(); xlCommit(); xlSelect(colLetter(ref.ci)+(ref.row+1)); }
-      else if (e.key === 'Escape') { xlEditing = false; xlRender(); xlSelectHighlight(); }
-      else if (e.key === 'Tab') { e.preventDefault(); xlCommit(); const nc=Math.max(0,ref.ci+(e.shiftKey?-1:1)); xlSelect(colLetter(nc)+ref.row); }
-      return;
-    }
+    if (xlEditing) return;
 
     const move = (ci, ri) => xlSelect(colLetter(Math.max(0,ref.ci+ci)) + Math.max(1,ref.row+ri));
     switch(e.key) {
