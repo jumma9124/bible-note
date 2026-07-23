@@ -1770,14 +1770,26 @@
     inp.addEventListener('blur', () => { if (xlEditing) xlCommit(); });
     inp.addEventListener('keydown', e => {
       const r = parseRef(xlSel); if (!r) return;
-      if (e.key === 'Tab') {
+      if (e.key === 'Tab' || e.key === 'Enter') {
         e.preventDefault(); e.stopPropagation();
-        xlCommit();
-        xlSelect(colLetter(Math.max(0, r.ci + (e.shiftKey ? -1 : 1))) + r.row);
-      } else if (e.key === 'Enter') {
-        e.preventDefault(); e.stopPropagation();
-        xlCommit();
-        xlSelect(colLetter(r.ci) + (r.row + 1));
+        const nextRef = e.key === 'Tab'
+          ? colLetter(Math.max(0, r.ci + (e.shiftKey ? -1 : 1))) + r.row
+          : colLetter(r.ci) + (r.row + 1);
+        // 저장 후 이동을 단일 렌더로 처리 (blur 중복 방지)
+        xlEditing = false;
+        const val = inp.value;
+        const db2 = xlDB.get(); const sh2 = db2.sheets[db2.active];
+        if (!sh2.data[xlSel]) sh2.data[xlSel] = {};
+        if (val.startsWith('=')) { sh2.data[xlSel].f = val; sh2.data[xlSel].v = ''; }
+        else { sh2.data[xlSel].v = val; sh2.data[xlSel].f = ''; }
+        const cc = sh2.data[xlSel];
+        if (!val && !cc.b && !cc.i && !cc.a && !cc.s && !cc.bg && !cc.tc && !cc.bd) delete sh2.data[xlSel];
+        xlDB.set(db2);
+        xlSel = nextRef;
+        xlSelCol = null; xlSelRow = null; xlSelAll = false;
+        xlRangeStart = null; xlRangeEnd = null;
+        xlRender();
+        xlSelectHighlight();
       } else if (e.key === 'Escape') {
         e.preventDefault(); e.stopPropagation();
         xlEditing = false; xlRender(); xlSelectHighlight();
