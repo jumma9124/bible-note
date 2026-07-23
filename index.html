@@ -1767,15 +1767,17 @@
     document.getElementById('xl-addr').textContent = xlSel;
     document.getElementById('xl-formula').value = inp.value;
     inp.addEventListener('input', () => { document.getElementById('xl-formula').value = inp.value; });
-    inp.addEventListener('blur', () => { if (xlEditing) xlCommit(); });
+    inp.addEventListener('blur', () => { console.log('[blur] xlEditing='+xlEditing+' xlSel='+xlSel); if (xlEditing) xlCommit(); });
     inp.addEventListener('keydown', e => {
+      if (e.isComposing) return; // 한국어 IME 조합 중 이벤트 무시
       const r = parseRef(xlSel); if (!r) return;
       if (e.key === 'Tab' || e.key === 'Enter') {
         e.preventDefault(); e.stopPropagation();
+        console.log('[Tab/Enter] key='+e.key+' xlSel='+xlSel+' r.ci='+r.ci);
         const nextRef = e.key === 'Tab'
           ? colLetter(Math.max(0, r.ci + (e.shiftKey ? -1 : 1))) + r.row
           : colLetter(r.ci) + (r.row + 1);
-        // 저장 후 이동을 단일 렌더로 처리 (blur 중복 방지)
+        console.log('[Tab/Enter] nextRef='+nextRef);
         xlEditing = false;
         const val = inp.value;
         const db2 = xlDB.get(); const sh2 = db2.sheets[db2.active];
@@ -1789,6 +1791,7 @@
         xlSelCol = null; xlSelRow = null; xlSelAll = false;
         xlRangeStart = null; xlRangeEnd = null;
         xlRender();
+        console.log('[Tab/Enter] after render xlSel='+xlSel);
         xlSelectHighlight();
       } else if (e.key === 'Escape') {
         e.preventDefault(); e.stopPropagation();
@@ -1935,6 +1938,7 @@
 
   /* ─ 키보드 ─ */
   document.addEventListener('keydown', e => {
+    if (e.isComposing) return; // 한국어 IME 조합 중 이벤트 무시
     if (document.getElementById('view-excel').style.display === 'none') return;
     // 탭 이름 편집 중이면 키 이벤트 무시
     if (document.activeElement && document.activeElement.classList.contains('tab-name-input')) return;
